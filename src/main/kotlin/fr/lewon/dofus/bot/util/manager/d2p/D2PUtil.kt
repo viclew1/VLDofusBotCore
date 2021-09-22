@@ -1,6 +1,7 @@
 package fr.lewon.dofus.bot.util.io.d2p
 
 import fr.lewon.dofus.bot.util.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.util.manager.d2p.maps.D2PIndex
 import java.io.File
 
 object D2PUtil {

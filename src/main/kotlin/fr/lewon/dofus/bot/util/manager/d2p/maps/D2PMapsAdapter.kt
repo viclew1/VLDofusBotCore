@@ -1,6 +1,5 @@
-package fr.lewon.dofus.bot.util.d2p.util
+package fr.lewon.dofus.bot.util.manager.d2p.maps
 
-import fr.lewon.dofus.bot.util.d2p.FightCellManager
 import fr.lewon.dofus.bot.util.io.d2p.cell.Cell
 import fr.lewon.dofus.bot.util.io.d2p.cell.CellData
 import fr.lewon.dofus.bot.util.io.d2p.element.BasicElement
@@ -8,9 +7,10 @@ import fr.lewon.dofus.bot.util.io.d2p.element.ElementType
 import fr.lewon.dofus.bot.util.io.d2p.element.GraphicalElement
 import fr.lewon.dofus.bot.util.io.d2p.element.SoundElement
 import fr.lewon.dofus.bot.util.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.util.manager.d2p.FightCellManager
 import kotlin.experimental.xor
 
-object MapsAdapter {
+object D2PMapsAdapter {
 
     fun loadFromData(data: ByteArray, decryptionKey: ByteArray? = null): List<CellData> {
         var stream = ByteArrayReader(data)

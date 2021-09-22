@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.util.io.d2p
+package fr.lewon.dofus.bot.util.manager.d2p.maps
 
 import fr.lewon.dofus.bot.util.io.stream.ByteArrayReader
 

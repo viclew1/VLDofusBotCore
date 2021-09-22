@@ -1,15 +1,17 @@
-package fr.lewon.dofus.bot.util.d2o
+package fr.lewon.dofus.bot.util.manager.d2o
 
 import fr.lewon.dofus.bot.model.maps.DofusMap
+import fr.lewon.dofus.bot.util.io.gamefiles.VldbFilesUtil
 import fr.lewon.dofus.bot.util.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.util.manager.VldbManager
 import java.io.File
 
-object DofusMapManager {
+object DofusMapManager : VldbManager {
 
     private val mapById = HashMap<Double, DofusMap>()
 
     init {
-        val dataDirPath = System.getProperty("user.home") + "/AppData/Local/Ankama/zaap/dofus/data/"
+        val dataDirPath = "${VldbFilesUtil.getDofusDirectory()}/data/"
         val d2oMapFile = File("$dataDirPath/common/MapPositions.d2o")
         val stream = ByteArrayReader(d2oMapFile.readBytes())
         require("D2O" == stream.readString(3)) { error("Invalid D2O file") }

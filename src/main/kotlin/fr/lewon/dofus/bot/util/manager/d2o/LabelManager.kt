@@ -1,9 +1,11 @@
-package fr.lewon.dofus.bot.util.d2o
+package fr.lewon.dofus.bot.util.manager.d2o
 
+import fr.lewon.dofus.bot.util.io.gamefiles.VldbFilesUtil
 import fr.lewon.dofus.bot.util.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.util.manager.VldbManager
 import java.io.File
 
-object LabelManager {
+object LabelManager : VldbManager {
 
     private val d2iStream: ByteArrayReader
     private val hintNameIdById = HashMap<Int, Int>()
@@ -14,7 +16,7 @@ object LabelManager {
     private val textIndexes = HashMap<String, Int>()
 
     init {
-        val dataDirPath = System.getProperty("user.home") + "/AppData/Local/Ankama/zaap/dofus/data/"
+        val dataDirPath = "${VldbFilesUtil.getDofusDirectory()}/data/"
         val d2iFile = File("$dataDirPath/i18n/i18n_fr.d2i")
         d2iStream = ByteArrayReader(d2iFile.readBytes())
         initHintNameIdById(File("$dataDirPath/common/PointOfInterest.d2o"))

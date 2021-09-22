@@ -1,6 +1,6 @@
 package fr.lewon.dofus.bot.model.maps
 
-import fr.lewon.dofus.bot.util.d2o.LabelManager
+import fr.lewon.dofus.bot.util.manager.d2o.LabelManager
 
 data class DofusMap(
     var subAreaId: Int = -1,
@@ -9,7 +9,7 @@ data class DofusMap(
     var posX: Int = -1,
     var posY: Int = -1
 ) {
-    
+
     fun getCoordinates(): DofusCoordinates {
         return DofusCoordinates(posX, posY)
     }
