@@ -1,13 +1,13 @@
 package fr.lewon.dofus.bot.util.manager.d2p.maps
 
-import fr.lewon.dofus.bot.util.io.d2p.cell.Cell
-import fr.lewon.dofus.bot.util.io.d2p.cell.CellData
-import fr.lewon.dofus.bot.util.io.d2p.element.BasicElement
-import fr.lewon.dofus.bot.util.io.d2p.element.ElementType
-import fr.lewon.dofus.bot.util.io.d2p.element.GraphicalElement
 import fr.lewon.dofus.bot.util.io.d2p.element.SoundElement
 import fr.lewon.dofus.bot.util.io.stream.ByteArrayReader
 import fr.lewon.dofus.bot.util.manager.d2p.FightCellManager
+import fr.lewon.dofus.bot.util.manager.d2p.maps.cell.Cell
+import fr.lewon.dofus.bot.util.manager.d2p.maps.cell.CellData
+import fr.lewon.dofus.bot.util.manager.d2p.maps.element.BasicElement
+import fr.lewon.dofus.bot.util.manager.d2p.maps.element.ElementType
+import fr.lewon.dofus.bot.util.manager.d2p.maps.element.GraphicalElement
 import kotlin.experimental.xor
 
 object D2PMapsAdapter {

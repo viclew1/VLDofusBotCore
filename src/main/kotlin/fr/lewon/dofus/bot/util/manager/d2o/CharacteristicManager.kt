@@ -7,9 +7,10 @@ import java.io.File
 
 object CharacteristicManager : VldbManager {
 
-    private val characteristicIdByKeyword = HashMap<String, Int>()
+    private lateinit var characteristicIdByKeyword: HashMap<String, Int>
 
-    init {
+    override fun initManager() {
+        characteristicIdByKeyword = HashMap()
         val dataDirPath = "${VldbFilesUtil.getDofusDirectory()}/data/"
         val d2oMapFile = File("$dataDirPath/common/Characteristics.d2o")
         val stream = ByteArrayReader(d2oMapFile.readBytes())

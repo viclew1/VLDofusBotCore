@@ -1,17 +1,16 @@
 package fr.lewon.dofus.bot.util.manager.d2p
 
-import fr.lewon.dofus.bot.util.io.d2p.D2PUtil
-import fr.lewon.dofus.bot.util.io.d2p.cell.CellData
 import fr.lewon.dofus.bot.util.io.gamefiles.VldbFilesUtil
 import fr.lewon.dofus.bot.util.manager.VldbManager
 import fr.lewon.dofus.bot.util.manager.d2p.maps.D2PMapsAdapter
+import fr.lewon.dofus.bot.util.manager.d2p.maps.cell.CellData
 import java.io.File
 
 object FightCellManager : VldbManager {
 
     const val MAP_CELLS_COUNT = 560
 
-    init {
+    override fun initManager() {
         val mapsPath = "${VldbFilesUtil.getDofusDirectory()}/content/maps"
         File(mapsPath).listFiles()
             ?.filter { it.absolutePath.endsWith(".d2p") }

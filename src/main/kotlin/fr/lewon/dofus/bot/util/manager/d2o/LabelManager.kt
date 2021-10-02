@@ -7,15 +7,21 @@ import java.io.File
 
 object LabelManager : VldbManager {
 
-    private val d2iStream: ByteArrayReader
-    private val hintNameIdById = HashMap<Int, Int>()
-    private val subAreaNameIdById = HashMap<Int, Int>()
-    private val areaIdBySubAreaId = HashMap<Int, Int>()
-    private val areaNameIdById = HashMap<Int, Int>()
-    private val indexes = HashMap<Int, Int>()
-    private val textIndexes = HashMap<String, Int>()
+    private lateinit var d2iStream: ByteArrayReader
+    private lateinit var hintNameIdById: HashMap<Int, Int>
+    private lateinit var subAreaNameIdById: HashMap<Int, Int>
+    private lateinit var areaIdBySubAreaId: HashMap<Int, Int>
+    private lateinit var areaNameIdById: HashMap<Int, Int>
+    private lateinit var indexes: HashMap<Int, Int>
+    private lateinit var textIndexes: HashMap<String, Int>
 
-    init {
+    override fun initManager() {
+        hintNameIdById = HashMap()
+        subAreaNameIdById = HashMap()
+        areaIdBySubAreaId = HashMap()
+        areaNameIdById = HashMap()
+        indexes = HashMap()
+        textIndexes = HashMap()
         val dataDirPath = "${VldbFilesUtil.getDofusDirectory()}/data/"
         val d2iFile = File("$dataDirPath/i18n/i18n_fr.d2i")
         d2iStream = ByteArrayReader(d2iFile.readBytes())

@@ -1,7 +1,8 @@
 package fr.lewon.dofus.bot.util.io.d2p.element
 
-import fr.lewon.dofus.bot.util.io.d2p.cell.Cell
 import fr.lewon.dofus.bot.util.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.util.manager.d2p.maps.cell.Cell
+import fr.lewon.dofus.bot.util.manager.d2p.maps.element.BasicElement
 
 class SoundElement(cell: Cell) : BasicElement(cell) {
 

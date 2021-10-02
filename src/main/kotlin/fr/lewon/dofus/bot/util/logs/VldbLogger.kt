@@ -42,7 +42,7 @@ object VldbLogger {
                 val ts = SimpleDateFormat("HH:mm:ss.SSS").format(Date())
                 println("$ts - [${logLevel.name}] - $message")
             }
-            val newItem = LogItem(message)
+            val newItem = LogItem(message, logLevel)
             if (parent != null) {
                 parent.addSubItem(newItem)
             } else if (!logs.offer(newItem)) {

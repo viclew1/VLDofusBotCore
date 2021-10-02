@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.util.io.d2p.cell
+package fr.lewon.dofus.bot.util.manager.d2p.maps.cell
 
 class CellData(val cellId: Int) {
 

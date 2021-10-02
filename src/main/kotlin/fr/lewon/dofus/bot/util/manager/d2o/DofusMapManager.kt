@@ -8,9 +8,10 @@ import java.io.File
 
 object DofusMapManager : VldbManager {
 
-    private val mapById = HashMap<Double, DofusMap>()
+    private lateinit var mapById: HashMap<Double, DofusMap>
 
-    init {
+    override fun initManager() {
+        mapById = HashMap()
         val dataDirPath = "${VldbFilesUtil.getDofusDirectory()}/data/"
         val d2oMapFile = File("$dataDirPath/common/MapPositions.d2o")
         val stream = ByteArrayReader(d2oMapFile.readBytes())
