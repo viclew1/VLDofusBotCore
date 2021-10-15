@@ -3,16 +3,24 @@ package fr.lewon.dofus.bot.core.logs
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
+import kotlin.collections.ArrayList
 
 object VldbLogger {
 
-    var logSubItemCapacity = 50
-    var logs = ArrayBlockingQueue<LogItem>(50)
+    var LOG_SUB_ITEM_CAPACITY = 50
     var minLogLevel = LogLevel.INFO
-    var onLogsChange: () -> Unit = {}
+        set(value) {
+            field = value
+            synchronized(logs) {
+                onLogsChange()
+            }
+        }
+    private val logs = ArrayBlockingQueue<LogItem>(50)
+    val listeners = ArrayList<VldbLoggerListener>()
 
     private fun onLogsChange() {
-        onLogsChange.invoke()
+        val filteredLogs = logs.filter { it.logLevel.level >= minLogLevel.level }
+        listeners.forEach { it.onLogsChange(filteredLogs) }
     }
 
     fun clearLogs() {
@@ -45,7 +53,7 @@ object VldbLogger {
             val newItem = LogItem(message, logLevel)
             if (parent != null) {
                 parent.addSubItem(newItem)
-            } else if (!logs.offer(newItem)) {
+            } else if (logLevel.level >= minLogLevel.level && !logs.offer(newItem)) {
                 logs.poll()
                 logs.offer(newItem)
             }

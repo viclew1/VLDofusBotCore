@@ -2,9 +2,9 @@ package fr.lewon.dofus.bot.core.logs
 
 import java.util.concurrent.ArrayBlockingQueue
 
-class LogItem(var message: String, val level: LogLevel) {
+class LogItem(var message: String, val logLevel: LogLevel) {
 
-    private val subLogs = ArrayBlockingQueue<LogItem>(VldbLogger.logSubItemCapacity)
+    private val subLogs = ArrayBlockingQueue<LogItem>(VldbLogger.LOG_SUB_ITEM_CAPACITY)
     private var closeMessage: String? = null
 
     fun addSubItem(logItem: LogItem) {
