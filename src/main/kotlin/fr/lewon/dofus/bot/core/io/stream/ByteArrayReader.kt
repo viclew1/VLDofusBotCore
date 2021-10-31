@@ -8,6 +8,16 @@ import java.util.zip.InflaterInputStream
 
 class ByteArrayReader(byteArray: ByteArray) : DataInputStream(ByteArrayInputStream(byteArray)) {
 
+    companion object {
+        private const val MASK_10000000 = 128
+        private const val MASK_01111111 = 127
+
+        private const val CHUNK_BIT_SIZE = 7
+        private const val LONG_SIZE = 64
+        private const val INT_SIZE = 32
+        private const val SHORT_SIZE = 16
+    }
+
     init {
         mark(Int.MAX_VALUE)
     }
@@ -23,28 +33,29 @@ class ByteArrayReader(byteArray: ByteArray) : DataInputStream(ByteArrayInputStre
     }
 
     fun readVarShort(): Int {
-        val shortValue = readVar(2).toInt()
+        val shortValue = readVar(SHORT_SIZE).toInt()
         if (shortValue > Short.MAX_VALUE) return shortValue - UShort.MAX_VALUE.toInt() - 1
         return shortValue
     }
 
     fun readVarInt(): Int {
-        return readVar(4).toInt()
+        return readVar(INT_SIZE).toInt()
     }
 
     fun readVarLong(): Long {
-        return readVar(8)
+        return readVar(LONG_SIZE)
     }
 
     private fun readVar(size: Int): Long {
         var ans = 0L
-        for (i in 0 until 8 * size step 7) {
-            val b = readByte()
-            ans += (b.toLong() and 0b01111111) shl i
-            if (b.toLong() and 0b10000000 == 0L)
+        for (offset in 0 until size step CHUNK_BIT_SIZE) {
+            val b = readUnsignedByte()
+            ans += (b and MASK_01111111) shl offset
+            if (b and MASK_10000000 != MASK_10000000) {
                 return ans
+            }
         }
-        return -1
+        error("Too much data")
     }
 
     fun skip(i: Int) {

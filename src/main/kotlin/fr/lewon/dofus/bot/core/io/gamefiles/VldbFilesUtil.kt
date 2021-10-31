@@ -19,13 +19,23 @@ object VldbFilesUtil {
         return BufferedReader(InputStreamReader(process.inputStream)).readLines()
     }
 
+    fun getDofusRoamingDirectory(): String {
+        val roamingDirPath = System.getProperty("user.home") + "/AppData/Roaming/Dofus/"
+        mkdirIfNeeded(roamingDirPath)
+        return roamingDirPath
+    }
+
     fun getVldbConfigDirectory(): String {
         val configDirPath = System.getProperty("user.home") + "/.VLDofusBot"
-        val configDirFile = File(configDirPath)
-        if (!configDirFile.exists() || !configDirFile.isDirectory) {
-            configDirFile.mkdir()
-        }
+        mkdirIfNeeded(configDirPath)
         return configDirPath
+    }
+
+    private fun mkdirIfNeeded(directoryPath: String) {
+        val dirFile = File(directoryPath)
+        if (!dirFile.exists() || !dirFile.isDirectory) {
+            dirFile.mkdir()
+        }
     }
 
 }
