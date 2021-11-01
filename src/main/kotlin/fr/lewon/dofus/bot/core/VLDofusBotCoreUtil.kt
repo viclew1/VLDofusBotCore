@@ -14,7 +14,7 @@ object VLDofusBotCoreUtil {
         I18NUtil.init()
         initAllD2O()
         initAllD2P()
-        initVldbManagers()
+        initVldbManagers(VldbManager::class.java.packageName)
     }
 
     private fun initAllD2O() {
@@ -33,8 +33,8 @@ object VLDofusBotCoreUtil {
             ?: error("Maps directory not found : $mapsPath}")
     }
 
-    private fun initVldbManagers() {
-        Reflections("")
+    fun initVldbManagers(basePackageName: String) {
+        Reflections(basePackageName)
             .getSubTypesOf(VldbManager::class.java)
             .mapNotNull { it.kotlin.objectInstance }
             .forEach { it.initManager() }
