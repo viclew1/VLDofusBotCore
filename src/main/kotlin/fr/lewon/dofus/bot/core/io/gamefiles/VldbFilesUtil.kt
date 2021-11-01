@@ -9,9 +9,21 @@ object VldbFilesUtil {
     fun getDofusDirectory(): String {
         val gameLocCmdResult: List<String> = execCmd("cmd", "/c", "where Dofus.exe")
         if (gameLocCmdResult.size != 1) {
-            throw RuntimeException("Unable to find Dofus.exe, is it in your path?")
+            return getDefaultDofusDirectory()
+                ?: error("Unable to find Dofus.exe in default location, put in in your path environment variable")
         }
         return File(gameLocCmdResult[0]).parentFile.absolutePath
+    }
+
+    private fun getDefaultDofusDirectory(): String? {
+        val dofusDirPath = System.getProperty("user.home") + "/AppData/Local/Ankama/Dofus/"
+        val dofusDir = File(dofusDirPath)
+        if (!dofusDir.exists()) {
+            return null
+        }
+        val dofusDirFiles = listOf(*(dofusDir.listFiles() ?: emptyArray()))
+        dofusDirFiles.firstOrNull { it.name.lowercase() == "dofus.exe" } ?: return null
+        return dofusDirPath
     }
 
     private fun execCmd(vararg command: String): List<String> {
