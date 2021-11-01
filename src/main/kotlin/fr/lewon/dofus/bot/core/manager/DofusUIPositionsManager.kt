@@ -18,54 +18,54 @@ object DofusUIPositionsManager : VldbManager {
         // Nothing
     }
 
-    fun getBannerUiPosition(context: String = CONTEXT_DEFAULT): UIPoint {
+    fun getBannerUiPosition(context: String = CONTEXT_DEFAULT): UIPoint? {
         return getUIPoint("banner", INFO_TYPE_POSITION, MAIN_CTR, context)
     }
 
-    fun getBannerMapUiPosition(): UIPoint {
+    fun getBannerMapUiPosition(): UIPoint? {
         return getUIPoint("bannerMap", INFO_TYPE_POSITION, MAIN_CTR, CONTEXT_DEFAULT)
     }
 
-    fun getBannerMapUiSize(): UIPoint {
+    fun getBannerMapUiSize(): UIPoint? {
         return getUIPoint("bannerMap", INFO_TYPE_SIZE, MAIN_CTR, CONTEXT_DEFAULT)
     }
 
-    fun getBannerMenuUiPosition(context: String = CONTEXT_DEFAULT): UIPoint {
+    fun getBannerMenuUiPosition(context: String = CONTEXT_DEFAULT): UIPoint? {
         return getUIPoint("bannerMenu", INFO_TYPE_POSITION, MAIN_CTR, context)
     }
 
-    fun getBannerMenuUiSize(): UIPoint {
+    fun getBannerMenuUiSize(): UIPoint? {
         return getUIPoint("bannerMenu", INFO_TYPE_SIZE, MAIN_CTR, CONTEXT_DEFAULT)
     }
 
-    fun getBuffUiPosition(): UIPoint {
+    fun getBuffUiPosition(): UIPoint? {
         return getUIPoint("buffUi", INFO_TYPE_POSITION, MAIN_CTR, CONTEXT_DEFAULT)
     }
 
-    fun getChatUiPosition(context: String = CONTEXT_DEFAULT): UIPoint {
+    fun getChatUiPosition(context: String = CONTEXT_DEFAULT): UIPoint? {
         return getUIPoint("chat", INFO_TYPE_POSITION, MAIN_CTR, context)
     }
 
-    fun getChatUiSize(): UIPoint {
+    fun getChatUiSize(): UIPoint? {
         return getUIPoint("chat", INFO_TYPE_SIZE, MAIN_CTR, CONTEXT_DEFAULT)
     }
 
-    fun getExternalActionBarUiPosition(actionBarId: Int): UIPoint {
+    fun getExternalActionBarUiPosition(actionBarId: Int): UIPoint? {
         return getUIPoint("externalActionBar_$actionBarId", INFO_TYPE_POSITION, MAIN_CTR, CONTEXT_DEFAULT)
     }
 
-    fun getQuestListUiPosition(): UIPoint {
+    fun getQuestListUiPosition(): UIPoint? {
         return getUIPoint("questList", INFO_TYPE_POSITION, CTR_MAIN, CONTEXT_DEFAULT)
     }
 
-    fun getTreasureHuntUiPosition(): UIPoint {
+    fun getTreasureHuntUiPosition(): UIPoint? {
         return getUIPoint("treasureHunt", INFO_TYPE_POSITION, CTR_HUNT, CONTEXT_DEFAULT)
     }
 
-    private fun getUIPoint(uiItemKey: String, infoType: String, ctr: String, context: String): UIPoint {
+    private fun getUIPoint(uiItemKey: String, infoType: String, ctr: String, context: String): UIPoint? {
         val key = buildKey(uiItemKey, infoType, ctr, context)
         val uiPointByKey = DatUtil.getDatFileContent("Berilia_ui_positions", DofusUIPointByKey::class.java)
-        return uiPointByKey[key] ?: error("No UI position for key : $key")
+        return uiPointByKey[key]
     }
 
     private fun buildKey(uiItemKey: String, infoType: String, ctr: String, context: String): String {
