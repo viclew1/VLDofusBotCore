@@ -107,12 +107,6 @@ class AMF3Reader {
                 }
             }
         }
-        if (result == 2097150) {
-            println(stream.readUnsignedByte())
-            println(stream.readUnsignedByte())
-            println(stream.readUnsignedByte())
-            println(stream.readUnsignedByte())
-        }
         return result
     }
 
