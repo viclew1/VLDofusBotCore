@@ -6,7 +6,7 @@ import java.io.DataInputStream
 import java.util.zip.InflaterInputStream
 
 
-class ByteArrayReader(byteArray: ByteArray) : DataInputStream(ByteArrayInputStream(byteArray)) {
+class ByteArrayReader(byteArray: ByteArray) : DataInputStream(ByteArrayStream(byteArray)) {
 
     companion object {
         private const val MASK_10000000 = 128
@@ -18,14 +18,22 @@ class ByteArrayReader(byteArray: ByteArray) : DataInputStream(ByteArrayInputStre
         private const val SHORT_SIZE = 16
     }
 
-    init {
-        mark(Int.MAX_VALUE)
+    private class ByteArrayStream(bytes: ByteArray) : ByteArrayInputStream(bytes) {
+        fun getPosition(): Int {
+            return pos
+        }
+
+        fun setPosition(pos: Int) {
+            this.pos = pos
+        }
+    }
+
+    fun getPosition(): Int {
+        return (`in` as ByteArrayStream).getPosition()
     }
 
     fun setPosition(position: Int) {
-        reset()
-        mark(Int.MAX_VALUE)
-        skip(position)
+        (`in` as ByteArrayStream).setPosition(position)
     }
 
     fun readString(length: Int): String {

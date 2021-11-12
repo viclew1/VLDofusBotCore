@@ -34,5 +34,5 @@ object DofusUIPositionsManager : VldbManager {
         return "$uiItemKey##$infoType##$ctr##$context"
     }
 
-    private class DofusUIPointByKey : HashMap<String, UIPoint>()
+    private class DofusUIPointByKey : HashMap<String, UIPoint?>()
 }

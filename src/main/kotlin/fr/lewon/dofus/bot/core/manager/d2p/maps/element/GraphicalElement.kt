@@ -4,25 +4,19 @@ import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import fr.lewon.dofus.bot.core.manager.d2p.maps.cell.Cell
 
 
-class GraphicalElement(cell: Cell) : BasicElement(cell) {
+class GraphicalElement(cell: Cell) : BasicElement(cell, ElementType.GRAPHICAL.typeValue) {
+
+    var elementId = -1
 
     override fun read(mapVersion: Int, stream: ByteArrayReader) {
-        stream.readInt()
-        stream.readByte()
-        stream.readByte()
-        stream.readByte()
-        stream.readByte()
-        stream.readByte()
-        stream.readByte()
+        elementId = stream.readInt()
+        stream.skip(6)
         if (mapVersion <= 4) {
-            stream.readByte()
-            stream.readByte()
+            stream.skip(2)
         } else {
-            stream.readUnsignedShort()
-            stream.readUnsignedShort()
+            stream.skip(4)
         }
-        stream.readByte()
-        stream.readInt()
+        stream.skip(5)
     }
 
 }

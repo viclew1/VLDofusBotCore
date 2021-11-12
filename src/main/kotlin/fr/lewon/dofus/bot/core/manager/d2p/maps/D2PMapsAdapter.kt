@@ -1,38 +1,89 @@
 package fr.lewon.dofus.bot.core.manager.d2p.maps
 
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.core.manager.d2p.AbstractD2PUrlLoaderAdapter
+import fr.lewon.dofus.bot.core.manager.d2p.D2PIndex
 import fr.lewon.dofus.bot.core.manager.d2p.maps.cell.Cell
 import fr.lewon.dofus.bot.core.manager.d2p.maps.cell.CellData
 import fr.lewon.dofus.bot.core.manager.d2p.maps.element.BasicElement
 import fr.lewon.dofus.bot.core.manager.d2p.maps.element.ElementType
 import fr.lewon.dofus.bot.core.manager.d2p.maps.element.GraphicalElement
 import fr.lewon.dofus.bot.core.manager.d2p.maps.element.SoundElement
+import java.io.File
 import kotlin.experimental.xor
 
-object D2PMapsAdapter {
+object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
 
     private const val MAP_CELLS_COUNT = 560
 
-    fun loadFromData(data: ByteArray, decryptionKey: ByteArray? = null): List<CellData> {
-        var stream = ByteArrayReader(data)
-        var header = stream.readByte().toInt()
-        if (header != 77) {
-            stream.setPosition(0)
-            stream = ByteArrayReader(stream.uncompress())
+    private val indexes = HashMap<Double, D2PIndex>()
+    private val properties = HashMap<String, String>()
 
-            header = stream.readByte().toInt()
-            if (header != 77) {
-                error("Invalid maps stream")
-            }
-        }
-        stream.setPosition(0)
-        return deserialize(stream, decryptionKey)
+    fun getCellDataList(mapId: Double, key: String): List<CellData> {
+        val index = indexes[mapId] ?: error("Missing map : $mapId")
+        val fileStream = index.stream
+        fileStream.setPosition(index.offset)
+        val data = fileStream.readNBytes(index.length)
+        return deserialize(loadFromData(data), key.toByteArray())
     }
 
-    fun deserialize(bar: ByteArrayReader, decryptionKey: ByteArray? = null): List<CellData> {
+    override fun initStream(path: String) {
+        var filePath = path
+        var file: File? = File(filePath)
+        var stream: ByteArrayReader
+        while (file != null && file.exists()) {
+            stream = ByteArrayReader(file.readBytes())
+            val vMax = stream.readByte().toInt()
+            val vMin = stream.readByte().toInt()
+            if (vMax != 2 || vMin != 1) {
+                error("Invalid maps file : $path")
+            }
+            stream.setPosition(file.length().toInt() - 24)
+            val dataOffset = stream.readInt()
+            val dataCount = stream.readInt()
+            val indexOffset = stream.readInt()
+            val indexCount = stream.readInt()
+            val propertiesOffset = stream.readInt()
+            val propertiesCount = stream.readInt()
+            stream.setPosition(propertiesOffset)
+            file = null
+            for (i in 0 until propertiesCount) {
+                val propertyName = stream.readUTF()
+                val propertyValue = stream.readUTF()
+                properties[propertyName] = propertyValue
+                if (propertyName == "link") {
+                    val idx = filePath.lastIndexOf("/")
+                    filePath = if (idx != -1) {
+                        filePath.substring(0, idx) + "/" + propertyValue
+                    } else {
+                        propertyValue
+                    }
+                    file = File(filePath)
+                }
+            }
+            stream.setPosition(indexOffset)
+            for (i in 0 until indexCount) {
+                filePath = stream.readUTF()
+                val fileOffset = stream.readInt()
+                val fileLength = stream.readInt()
+                indexes[getMapId(filePath)] = D2PIndex(fileOffset + dataOffset, fileLength, stream)
+            }
+        }
+    }
+
+    private fun getMapId(filePath: String): Double {
+        return Regex(".*?/([0-9]+)\\.dlm")
+            .find(filePath)
+            ?.destructured
+            ?.component1()
+            ?.toDouble()
+            ?: error("Invalid key")
+    }
+
+    private fun deserialize(bar: ByteArrayReader, decryptionKey: ByteArray): List<CellData> {
         var stream = bar
         val header = stream.readByte().toInt()
-        if (header != 77) {
+        if (header != loaderHeader) {
             error("Unknown file format")
         }
         val mapVersion = stream.readByte().toInt()
@@ -42,7 +93,6 @@ object D2PMapsAdapter {
             val encryptionVersion = stream.readByte()
             val dataLen = stream.readInt()
             if (encrypted) {
-                decryptionKey ?: error("Map decryption key is empty")
                 val encryptedData = stream.readNBytes(dataLen)
                 for (i in encryptedData.indices) {
                     encryptedData[i] = encryptedData[i] xor decryptionKey[i % decryptionKey.size]

@@ -13,17 +13,17 @@ class AMF3Reader {
     private val classes = ArrayList<AMF3Class>()
     private val strings = ArrayList<String>()
 
-    fun read(byteArray: ByteArray): Any {
+    fun read(byteArray: ByteArray): Any? {
         return read(ByteArrayReader(byteArray))
     }
 
-    private fun read(stream: ByteArrayReader): Any {
+    private fun read(stream: ByteArrayReader): Any? {
         return read(stream, stream.readUnsignedByte())
     }
 
-    private fun read(stream: ByteArrayReader, type: Int): Any {
+    private fun read(stream: ByteArrayReader, type: Int): Any? {
         return when (AMF3Type.fromInt(type)) {
-            AMF3Type.NULL -> "[NULL]"
+            AMF3Type.NULL -> null
             AMF3Type.BOOL_FALSE -> false
             AMF3Type.BOOL_TRUE -> true
             AMF3Type.OBJECT -> readObject(stream)
@@ -72,7 +72,7 @@ class AMF3Reader {
             objects.add(elements)
             return elements
         }
-        val elements = HashMap<Any, Any>()
+        val elements = HashMap<Any, Any?>()
         objects.add(elements)
         while (key.isNotEmpty()) {
             elements[key] = read(stream)
@@ -118,7 +118,7 @@ class AMF3Reader {
         }
 
         val classDef = getClassDef(stream, objectReference)
-        val objectAttributes = HashMap<String, Any>()
+        val objectAttributes = HashMap<String, Any?>()
         objects.add(objectAttributes)
 
         when (AMF3Encoding.fromInt(classDef.encoding)) {
@@ -132,13 +132,13 @@ class AMF3Reader {
         return objectAttributes
     }
 
-    private fun readStatic(stream: ByteArrayReader, classDef: AMF3Class, objectAttributes: HashMap<String, Any>) {
+    private fun readStatic(stream: ByteArrayReader, classDef: AMF3Class, objectAttributes: HashMap<String, Any?>) {
         for (attr in classDef.properties) {
             objectAttributes[attr] = read(stream)
         }
     }
 
-    private fun readDynamic(stream: ByteArrayReader, objectAttributes: HashMap<String, Any>) {
+    private fun readDynamic(stream: ByteArrayReader, objectAttributes: HashMap<String, Any?>) {
         var attr = readString(stream)
         while (attr.isNotEmpty()) {
             objectAttributes[attr] = read(stream)
