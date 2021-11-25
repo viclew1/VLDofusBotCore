@@ -8,7 +8,10 @@ data class DofusMap(
     var worldMap: Int = -1,
     var id: Double = -1.0,
     var posX: Int = -1,
-    var posY: Int = -1
+    var posY: Int = -1,
+    var outdoor: Boolean = false,
+    var isTransition: Boolean = false,
+    var hasPriorityOnWorldMap: Boolean = false
 ) {
 
     fun getCoordinates(): DofusCoordinates {

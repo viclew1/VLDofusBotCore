@@ -8,7 +8,7 @@ object CharacteristicManager : VldbManager {
 
     override fun initManager() {
         val objects = D2OUtil.getObjects("Characteristics")
-        characteristicIdByKeyword = objects.map { buildStringIntEntry(it["keyword"], it["id"]) }.toMap()
+        characteristicIdByKeyword = objects.associate { buildStringIntEntry(it["keyword"], it["id"]) }
     }
 
     private fun buildStringIntEntry(key: Any?, value: Any?): Pair<String, Int> {

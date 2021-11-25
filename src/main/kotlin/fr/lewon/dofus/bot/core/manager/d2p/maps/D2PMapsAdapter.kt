@@ -5,6 +5,7 @@ import fr.lewon.dofus.bot.core.manager.d2p.AbstractD2PUrlLoaderAdapter
 import fr.lewon.dofus.bot.core.manager.d2p.D2PIndex
 import fr.lewon.dofus.bot.core.manager.d2p.maps.cell.Cell
 import fr.lewon.dofus.bot.core.manager.d2p.maps.cell.CellData
+import fr.lewon.dofus.bot.core.manager.d2p.maps.cell.CompleteCellData
 import fr.lewon.dofus.bot.core.manager.d2p.maps.element.BasicElement
 import fr.lewon.dofus.bot.core.manager.d2p.maps.element.ElementType
 import fr.lewon.dofus.bot.core.manager.d2p.maps.element.GraphicalElement
@@ -14,12 +15,12 @@ import kotlin.experimental.xor
 
 object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
 
-    private const val MAP_CELLS_COUNT = 560
+    const val MAP_CELLS_COUNT = 560
 
     private val indexes = HashMap<Double, D2PIndex>()
     private val properties = HashMap<String, String>()
 
-    fun getCellDataList(mapId: Double, key: String): List<CellData> {
+    fun getCompleteCellDataByCellId(mapId: Double, key: String): HashMap<Int, CompleteCellData> {
         val index = indexes[mapId] ?: error("Missing map : $mapId")
         val fileStream = index.stream
         fileStream.setPosition(index.offset)
@@ -80,7 +81,7 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
             ?: error("Invalid key")
     }
 
-    private fun deserialize(bar: ByteArrayReader, decryptionKey: ByteArray): List<CellData> {
+    private fun deserialize(bar: ByteArrayReader, decryptionKey: ByteArray): HashMap<Int, CompleteCellData> {
         var stream = bar
         val header = stream.readByte().toInt()
         if (header != loaderHeader) {
@@ -141,16 +142,20 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
         stream.readInt()
         val groundCRC = stream.readInt()
         val layersCount = stream.readByte()
-        val layers = ArrayList<List<Cell>>()
+        val completeCellDataById = HashMap<Int, CompleteCellData>()
+        val graphicalElementsByCellId = HashMap<Int, ArrayList<GraphicalElement>>()
         for (i in 0 until layersCount) {
-            layers.add(readLayer(mapVersion, stream))
+            readLayer(mapVersion, stream).forEach {
+                val graphicalElements = graphicalElementsByCellId.computeIfAbsent(it.cellId) { ArrayList() }
+                graphicalElements.addAll(it.graphicalElements)
+            }
         }
-        val cells = ArrayList<CellData>()
         for (i in 0 until cellsCount) {
             val cd = readCellData(mapVersion, i, stream)
-            cells.add(cd)
+            val graphicalElements = graphicalElementsByCellId[cd.cellId] ?: emptyList()
+            completeCellDataById[cd.cellId] = CompleteCellData(cd.cellId, cd, graphicalElements)
         }
-        return cells
+        return completeCellDataById
     }
 
     private fun readFixture(stream: ByteArrayReader) {
@@ -182,7 +187,7 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
             }
             val maxMapCellId = MAP_CELLS_COUNT - 1
             if (cell != null && cell.cellId < maxMapCellId) {
-                val endCell = Cell(maxMapCellId, 0)
+                val endCell = Cell(maxMapCellId)
                 cells.add(endCell)
             }
         }
@@ -192,10 +197,13 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
     private fun readCell(mapVersion: Int, stream: ByteArrayReader): Cell {
         val cellId = stream.readUnsignedShort()
         val elementsCount = stream.readUnsignedShort()
-        val cell = Cell(cellId, elementsCount)
+        val cell = Cell(cellId)
         for (i in 0 until elementsCount) {
             val be = getBasicElement(stream.readByte().toInt(), cell)
             be.read(mapVersion, stream)
+            if (be is GraphicalElement) {
+                cell.graphicalElements.add(be)
+            }
         }
         return cell
     }
@@ -246,7 +254,7 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
         if (mapVersion > 10 && (cd.hasLinkedZoneRP() || cd.hasLinkedZoneFight())) {
             cd.linkedZone = stream.readByte().toInt()
         }
-        if (mapVersion == 0) {
+        if (mapVersion == 8) {
             val tmpBits = stream.readByte().toInt()
             cd.arrow = 15 and tmpBits
         }

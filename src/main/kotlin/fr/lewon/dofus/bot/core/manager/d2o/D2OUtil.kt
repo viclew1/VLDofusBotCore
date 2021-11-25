@@ -36,6 +36,10 @@ object D2OUtil {
         return objects
     }
 
+    fun getObject(moduleName: String, id: Double, idFieldName: String = "id"): Map<String, Any>? {
+        return getObjects(moduleName).firstOrNull { it[idFieldName].toString().toDouble() == id }
+    }
+
     fun init(filePath: String) {
         val file = File(filePath)
         val moduleName = file.name.substring(0, file.name.indexOf(".d2o"))
