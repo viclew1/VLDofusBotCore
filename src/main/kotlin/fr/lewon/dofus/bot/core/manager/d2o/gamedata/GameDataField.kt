@@ -38,7 +38,7 @@ class GameDataField(val name: String) {
         val len = stream.readInt()
         val content = ArrayList<Any>()
         for (i in 0 until len) {
-            content.add(innerReadMethods[innerIndex].invoke(moduleName, stream, innerIndex + 1))
+            content.add(innerReadMethods[innerIndex](moduleName, stream, innerIndex + 1))
         }
         return content
     }

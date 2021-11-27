@@ -11,7 +11,7 @@ enum class Direction(
     TOP(6, { BOTTOM });
 
     fun getReverseDir(): Direction {
-        return reverseDirFetcher.invoke()
+        return reverseDirFetcher()
     }
 
     companion object {

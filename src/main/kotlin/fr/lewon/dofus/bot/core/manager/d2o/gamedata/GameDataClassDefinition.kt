@@ -9,7 +9,7 @@ class GameDataClassDefinition {
     fun read(module: String, stream: ByteArrayReader): Map<String, Any> {
         val content = HashMap<String, Any>()
         for (field in fields) {
-            content[field.name] = field.readData.invoke(module, stream, 0)
+            content[field.name] = field.readData(module, stream, 0)
         }
         return content
     }
