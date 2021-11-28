@@ -75,8 +75,8 @@ object WorldGraphUtil {
                 }
                 val mapOutgoingEdges = outgoingEdges[node.vertex.uid]
                     ?.filter { !explored.contains(it.to) }
-                    ?.onEach { explored.add(it.to) }
                     ?.flatMap { buildNodes(node, it) }
+                    ?.onEach { explored.add(it.vertex) }
                     ?: emptyList()
                 newFrontier.addAll(mapOutgoingEdges)
             }
