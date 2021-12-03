@@ -3,11 +3,10 @@ package fr.lewon.dofus.bot.core.logs
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
-import kotlin.collections.ArrayList
 
 object VldbLogger {
 
-    var LOG_SUB_ITEM_CAPACITY = 50
+    var LOG_ITEM_CAPACITY = 8
     var minLogLevel = LogLevel.INFO
         set(value) {
             field = value
@@ -15,7 +14,7 @@ object VldbLogger {
                 onLogsChange()
             }
         }
-    private val logs = ArrayBlockingQueue<LogItem>(50)
+    private val logs = ArrayBlockingQueue<LogItem>(LOG_ITEM_CAPACITY)
     val listeners = ArrayList<VldbLoggerListener>()
 
     private fun onLogsChange() {
