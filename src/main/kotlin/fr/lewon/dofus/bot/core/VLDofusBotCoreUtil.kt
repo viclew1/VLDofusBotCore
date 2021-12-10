@@ -46,7 +46,7 @@ object VLDofusBotCoreUtil {
     }
 
     private fun initWorldGraph() {
-        val worldGraphPath = "${VldbFilesUtil.getDofusDirectory()}/content/maps/worldgraph.bin"
+        val worldGraphPath = "${VldbFilesUtil.getDofusDirectory()}/content/maps/world-graph.binary"
         val worldGraphFile = File(worldGraphPath)
         if (!worldGraphFile.exists() || !worldGraphFile.isFile) {
             error("World graph file not found")
