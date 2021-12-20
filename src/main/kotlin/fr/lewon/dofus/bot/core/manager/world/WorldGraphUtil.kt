@@ -56,11 +56,14 @@ object WorldGraphUtil {
     fun getPath(fromMap: DofusMap, fromZone: Int, toMaps: List<DofusMap>): List<Transition>? {
         val fromVertex = vertices[fromMap.id]?.get(fromZone) ?: return null
         val toMapsIds = toMaps.map { it.id }
-        val destVertices = vertices.entries
+        var destVertices = vertices.entries
             .filter { toMapsIds.contains(it.key) }
             .flatMap { it.value.values }
         if (destVertices.isEmpty()) {
             return null
+        }
+        destVertices.filter { it.zoneId == 1 }.takeIf { it.isNotEmpty() }?.let {
+            destVertices = it
         }
         val explored = ArrayList<Vertex>()
         var frontier = ArrayList<Node>()
@@ -70,7 +73,7 @@ object WorldGraphUtil {
         while (frontier.isNotEmpty()) {
             val newFrontier = ArrayList<Node>()
             for (node in frontier) {
-                if (toMapsIds.contains(node.vertex.mapId)) {
+                if (destVertices.contains(node.vertex)) {
                     return node.getTransitions()
                 }
                 val mapOutgoingEdges = outgoingEdges[node.vertex.uid]

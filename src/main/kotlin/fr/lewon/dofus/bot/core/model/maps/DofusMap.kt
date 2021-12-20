@@ -18,10 +18,6 @@ data class DofusMap(
         return DofusCoordinates(posX, posY)
     }
 
-    fun isAltWorld(): Boolean {
-        return worldMap != 1
-    }
-
     fun getSubAreaLabel(): String {
         return LabelManager.getSubAreaLabel(subAreaId)
     }

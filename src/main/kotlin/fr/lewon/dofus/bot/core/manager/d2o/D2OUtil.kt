@@ -3,9 +3,11 @@ package fr.lewon.dofus.bot.core.manager.d2o
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import fr.lewon.dofus.bot.core.manager.d2o.gamedata.GameDataClassDefinition
 import java.io.File
+import java.util.concurrent.locks.ReentrantLock
 
 object D2OUtil {
 
+    private val lock = ReentrantLock()
     private val streamsByModuleName = HashMap<String, ByteArrayReader>()
     private val streamStartIndexesByModuleName = HashMap<String, Int>()
     private val classesByModuleName = HashMap<String, HashMap<Int, GameDataClassDefinition>>()
@@ -18,22 +20,27 @@ object D2OUtil {
     }
 
     fun getObjects(moduleName: String): List<Map<String, Any>> {
-        val stream = streamsByModuleName[moduleName]
-            ?: error("Didn't load stream for module : $moduleName")
-        val classes = classesByModuleName[moduleName]
-            ?: error("Didn't load classes for module : $moduleName")
-        val streamStartIndex = streamStartIndexesByModuleName[moduleName]
-            ?: error("Didn't load stream start index for module : $moduleName")
-        val count = counterByModuleName[moduleName]
-            ?: error("Didn't load count for module : $moduleName")
+        try {
+            lock.lockInterruptibly()
+            val stream = streamsByModuleName[moduleName]
+                ?: error("Didn't load stream for module : $moduleName")
+            val classes = classesByModuleName[moduleName]
+                ?: error("Didn't load classes for module : $moduleName")
+            val streamStartIndex = streamStartIndexesByModuleName[moduleName]
+                ?: error("Didn't load stream start index for module : $moduleName")
+            val count = counterByModuleName[moduleName]
+                ?: error("Didn't load count for module : $moduleName")
 
-        stream.setPosition(streamStartIndex)
-        val objects = ArrayList<Map<String, Any>>()
-        for (i in 0 until count) {
-            val classDef = classes[stream.readInt()] ?: error("Failed to load class definitions")
-            objects.add(classDef.read(moduleName, stream))
+            stream.setPosition(streamStartIndex)
+            val objects = ArrayList<Map<String, Any>>()
+            for (i in 0 until count) {
+                val classDef = classes[stream.readInt()] ?: error("Failed to load class definitions")
+                objects.add(classDef.read(moduleName, stream))
+            }
+            return objects
+        } finally {
+            lock.unlock()
         }
-        return objects
     }
 
     fun getObject(moduleName: String, id: Double, idFieldName: String = "id"): Map<String, Any>? {
