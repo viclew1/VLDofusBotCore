@@ -14,6 +14,10 @@ object WaypointsManager : VldbManager {
             .map { it["mapId"].toString().toDouble() }
     }
 
+    override fun getNeededManagers(): List<VldbManager> {
+        return emptyList()
+    }
+
     private fun isSubAreaConquest(subAreaId: Double): Boolean {
         val subArea = D2OUtil.getObject("SubAreas", subAreaId)
             ?: error("SubArea not found : $subAreaId")

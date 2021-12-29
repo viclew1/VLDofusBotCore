@@ -4,4 +4,6 @@ interface VldbManager {
 
     fun initManager()
 
+    fun getNeededManagers(): List<VldbManager>
+
 }

@@ -16,6 +16,10 @@ object LabelManager : VldbManager {
         initAreas()
     }
 
+    override fun getNeededManagers(): List<VldbManager> {
+        return emptyList()
+    }
+
     private fun initPointOfInterest() {
         val objects = D2OUtil.getObjects("PointOfInterest")
         hintNameIdById = objects.map { buildIntIntEntry(it["id"], it["nameId"]) }.toMap()

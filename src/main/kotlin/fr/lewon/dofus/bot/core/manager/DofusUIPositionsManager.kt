@@ -3,14 +3,10 @@ package fr.lewon.dofus.bot.core.manager
 import fr.lewon.dofus.bot.core.manager.dat.DatUtil
 import fr.lewon.dofus.bot.core.manager.ui.UIPoint
 
-object DofusUIPositionsManager : VldbManager {
+object DofusUIPositionsManager {
 
     const val CONTEXT_DEFAULT = "default"
     const val CONTEXT_FIGHT = "fight"
-
-    override fun initManager() {
-        // Nothing
-    }
 
     fun getZaapSelectionUiPosition(): UIPoint? {
         return getUIPoint("zaapSelection", "pos", "window316", CONTEXT_DEFAULT)

@@ -38,11 +38,23 @@ object VLDofusBotCoreUtil {
             ?: error("Maps directory not found : $mapsPath}")
     }
 
-    fun initVldbManagers(basePackageName: String) {
-        Reflections(basePackageName)
+    private fun initVldbManagers(basePackageName: String) {
+        val managers = Reflections(basePackageName)
             .getSubTypesOf(VldbManager::class.java)
             .mapNotNull { it.kotlin.objectInstance }
-            .forEach { it.initManager() }
+
+        val initializedManagers = ArrayList<VldbManager>()
+        managers.forEach { initManager(it, initializedManagers) }
+    }
+
+    private fun initManager(manager: VldbManager, initializedManagers: ArrayList<VldbManager>) {
+        manager.getNeededManagers().forEach {
+            initManager(it, initializedManagers)
+        }
+        if (!initializedManagers.contains(manager)) {
+            manager.initManager()
+            initializedManagers.add(manager)
+        }
     }
 
     private fun initWorldGraph() {

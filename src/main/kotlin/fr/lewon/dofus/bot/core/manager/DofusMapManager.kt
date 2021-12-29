@@ -22,6 +22,10 @@ object DofusMapManager : VldbManager {
         }
     }
 
+    override fun getNeededManagers(): List<VldbManager> {
+        return emptyList()
+    }
+
     private fun getStringByKey(d2oObject: Map<String, Any>, key: String): String {
         val value = d2oObject[key]
         return value?.toString() ?: error("invalid map value for [$key] : $value")
