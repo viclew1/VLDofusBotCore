@@ -19,9 +19,8 @@ object WaypointsManager : VldbManager {
     }
 
     private fun isSubAreaConquest(subAreaId: Double): Boolean {
-        val subArea = D2OUtil.getObject("SubAreas", subAreaId)
+        return SubAreaManager.getSubArea(subAreaId)?.isConquestVillage
             ?: error("SubArea not found : $subAreaId")
-        return subArea["isConquestVillage"].toString().toBoolean()
     }
 
     fun getAllZaapMaps(): List<DofusMap> {

@@ -11,14 +11,14 @@ import fr.lewon.dofus.bot.core.manager.world.WorldGraphUtil
 import org.reflections.Reflections
 import java.io.File
 
-object VLDofusBotCoreUtil {
+object VldbCoreInitializer {
 
     fun initAll() {
-        I18NUtil.init()
-        initAllD2O()
-        initAllD2P()
-        initVldbManagers(VldbManager::class.java.packageName)
-        initWorldGraph()
+        processInitialization({ I18NUtil.init() }, "Initializing I18N ... ")
+        processInitialization({ initAllD2O() }, "Initializing D2O ... ")
+        processInitialization({ initAllD2P() }, "Initializing D2P ... ")
+        processInitialization({ initVldbManagers() }, "Initializing VLDB managers ... \n")
+        processInitialization({ initWorldGraph() }, "Initializing world graph ... ")
     }
 
     private fun initAllD2O() {
@@ -38,7 +38,8 @@ object VLDofusBotCoreUtil {
             ?: error("Maps directory not found : $mapsPath}")
     }
 
-    private fun initVldbManagers(basePackageName: String) {
+    private fun initVldbManagers() {
+        val basePackageName = VldbManager::class.java.packageName
         val managers = Reflections(basePackageName)
             .getSubTypesOf(VldbManager::class.java)
             .mapNotNull { it.kotlin.objectInstance }
@@ -52,7 +53,8 @@ object VLDofusBotCoreUtil {
             initManager(it, initializedManagers)
         }
         if (!initializedManagers.contains(manager)) {
-            manager.initManager()
+            val startMessage = " - Initializing manager [${manager::class.java.simpleName}] ... "
+            processInitialization({ manager.initManager() }, startMessage)
             initializedManagers.add(manager)
         }
     }
@@ -64,6 +66,14 @@ object VLDofusBotCoreUtil {
             error("World graph file not found")
         }
         WorldGraphUtil.init(ByteArrayReader(worldGraphFile.readBytes()))
+    }
+
+    private fun processInitialization(initialization: () -> Unit, startMessage: String) {
+        print(startMessage)
+        val startTime = System.currentTimeMillis()
+        initialization()
+        val duration = System.currentTimeMillis() - startTime
+        println("OK - $duration millis")
     }
 
 }

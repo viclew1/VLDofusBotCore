@@ -12,22 +12,19 @@ object ItemManager : VldbManager {
         val objects = D2OUtil.getObjects("Items")
         itemById = objects.associate { item ->
             val id = item["id"].toString().toDouble()
-            val effects = (item["possibleEffects"] as List<Map<String, Any>>).mapNotNull { possibleEffect ->
+            val possibleEffects = (item["possibleEffects"] as List<Map<String, Any>>).mapNotNull { possibleEffect ->
                 val effectId = possibleEffect["effectId"].toString().toDouble()
-                val effect = D2OUtil.getObject("Effects", effectId) ?: error("Effect not found : $effectId")
-                val characteristicId = effect["characteristic"].toString().toDouble()
+                val characteristic = EffectManager.getCharacteristicByEffectId(effectId)
                 val min = possibleEffect["diceNum"].toString().toInt()
                 val max = possibleEffect["diceSide"].toString().toInt()
-                CharacteristicManager.getCharacteristic(characteristicId)?.let {
-                    DofusItemEffect(min, max, it)
-                }
+                characteristic?.let { DofusItemEffect(min, max, it) }
             }
-            id to DofusItem(id, effects)
+            id to DofusItem(id, possibleEffects)
         }
     }
 
     override fun getNeededManagers(): List<VldbManager> {
-        return listOf(CharacteristicManager)
+        return listOf(EffectManager)
     }
 
     fun getItem(id: Double): DofusItem {

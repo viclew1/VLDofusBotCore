@@ -22,18 +22,18 @@ object LabelManager : VldbManager {
 
     private fun initPointOfInterest() {
         val objects = D2OUtil.getObjects("PointOfInterest")
-        hintNameIdById = objects.map { buildIntIntEntry(it["id"], it["nameId"]) }.toMap()
+        hintNameIdById = objects.associate { buildIntIntEntry(it["id"], it["nameId"]) }
     }
 
     private fun initSubAreas() {
         val objects = D2OUtil.getObjects("SubAreas")
-        subAreaNameIdById = objects.map { buildIntIntEntry(it["id"], it["nameId"]) }.toMap()
-        areaIdBySubAreaId = objects.map { buildIntIntEntry(it["id"], it["areaId"]) }.toMap()
+        subAreaNameIdById = objects.associate { buildIntIntEntry(it["id"], it["nameId"]) }
+        areaIdBySubAreaId = objects.associate { buildIntIntEntry(it["id"], it["areaId"]) }
     }
 
     private fun initAreas() {
         val objects = D2OUtil.getObjects("Areas")
-        areaNameIdById = objects.map { buildIntIntEntry(it["id"], it["nameId"]) }.toMap()
+        areaNameIdById = objects.associate { buildIntIntEntry(it["id"], it["nameId"]) }
     }
 
     private fun buildIntIntEntry(key: Any?, value: Any?): Pair<Int, Int> {
