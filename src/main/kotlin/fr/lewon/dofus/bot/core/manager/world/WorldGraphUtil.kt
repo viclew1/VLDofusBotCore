@@ -89,7 +89,19 @@ object WorldGraphUtil {
     }
 
     private fun buildNodes(parentNode: Node, edge: Edge): List<Node> {
-        return edge.transitions.filter { it.criterion.isEmpty() }.map { Node(parentNode, edge.to, it) }
+        return getEdgeTransitions(edge).map { Node(parentNode, edge.to, it) }
+    }
+
+    fun getEdgeTransitions(edge: Edge): List<Transition> {
+        return edge.transitions.filter { it.criterion.isEmpty() }
+    }
+
+    fun getVertex(mapId: Double, zoneId: Int): Vertex? {
+        return vertices[mapId]?.get(zoneId)
+    }
+
+    fun getOutgoingEdges(vertex: Vertex): List<Edge> {
+        return outgoingEdges[vertex.uid] ?: return emptyList()
     }
 
     private class Node(val parent: Node?, val vertex: Vertex, val transition: Transition?) {

@@ -28,9 +28,12 @@ class VldbLogger(
         }
     }
 
-    fun closeLog(message: String, parent: LogItem) {
+    fun closeLog(message: String, parent: LogItem, clearSubLogs: Boolean = false) {
         synchronized(logs) {
             parent.closeLog(message)
+            if (clearSubLogs) {
+                parent.clearSubLogs()
+            }
             onLogsChange()
         }
     }

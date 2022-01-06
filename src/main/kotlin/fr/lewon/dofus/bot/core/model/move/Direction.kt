@@ -1,7 +1,7 @@
 package fr.lewon.dofus.bot.core.model.move
 
 enum class Direction(
-    private val directionInt: Int,
+    val directionInt: Int,
     private val reverseDirFetcher: () -> Direction
 ) {
 

@@ -39,6 +39,10 @@ class LogItem(var message: String, val logLevel: LogLevel, subItemCapacity: Int)
         return ret
     }
 
+    fun clearSubLogs() {
+        subLogs.clear()
+    }
+
     fun closeLog(message: String) {
         closeMessage = message
     }
