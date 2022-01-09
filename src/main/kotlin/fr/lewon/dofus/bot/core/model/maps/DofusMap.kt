@@ -1,29 +1,19 @@
 package fr.lewon.dofus.bot.core.model.maps
 
-import fr.lewon.dofus.bot.core.manager.LabelManager
-
 
 data class DofusMap(
-    var subAreaId: Int = -1,
-    var worldMap: Int = -1,
-    var id: Double = -1.0,
-    var posX: Int = -1,
-    var posY: Int = -1,
-    var outdoor: Boolean = false,
-    var isTransition: Boolean = false,
-    var hasPriorityOnWorldMap: Boolean = false
+    val subArea: DofusSubArea,
+    val worldMap: Int,
+    val id: Double,
+    val posX: Int,
+    val posY: Int,
+    val outdoor: Boolean,
+    val isTransition: Boolean,
+    val hasPriorityOnWorldMap: Boolean
 ) {
 
     fun getCoordinates(): DofusCoordinates {
         return DofusCoordinates(posX, posY)
-    }
-
-    fun getSubAreaLabel(): String {
-        return LabelManager.getSubAreaLabel(subAreaId)
-    }
-
-    fun getAreaLabel(): String {
-        return LabelManager.getAreaLabel(subAreaId)
     }
 
 }

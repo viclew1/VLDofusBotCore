@@ -24,7 +24,7 @@ object WaypointsManager : VldbManager {
     }
 
     fun getAllZaapMaps(): List<DofusMap> {
-        return waypointsIds.map { DofusMapManager.getDofusMap(it) }
+        return waypointsIds.map { MapManager.getDofusMap(it) }
     }
 
 }
