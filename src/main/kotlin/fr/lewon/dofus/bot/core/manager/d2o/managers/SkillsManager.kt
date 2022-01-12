@@ -1,5 +1,6 @@
-package fr.lewon.dofus.bot.core.manager
+package fr.lewon.dofus.bot.core.manager.d2o.managers
 
+import fr.lewon.dofus.bot.core.manager.VldbManager
 import fr.lewon.dofus.bot.core.manager.d2o.D2OUtil
 import fr.lewon.dofus.bot.core.model.interactive.DofusSkill
 

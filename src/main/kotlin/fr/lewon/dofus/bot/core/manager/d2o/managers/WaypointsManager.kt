@@ -1,5 +1,6 @@
-package fr.lewon.dofus.bot.core.manager
+package fr.lewon.dofus.bot.core.manager.d2o.managers
 
+import fr.lewon.dofus.bot.core.manager.VldbManager
 import fr.lewon.dofus.bot.core.manager.d2o.D2OUtil
 import fr.lewon.dofus.bot.core.model.maps.DofusMap
 
@@ -19,8 +20,7 @@ object WaypointsManager : VldbManager {
     }
 
     private fun isSubAreaConquest(subAreaId: Double): Boolean {
-        return SubAreaManager.getSubArea(subAreaId)?.isConquestVillage
-            ?: error("SubArea not found : $subAreaId")
+        return SubAreaManager.getSubArea(subAreaId).isConquestVillage
     }
 
     fun getAllZaapMaps(): List<DofusMap> {

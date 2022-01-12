@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.manager
+package fr.lewon.dofus.bot.core.manager.dat.managers
 
 import fr.lewon.dofus.bot.core.manager.dat.DatUtil
 import fr.lewon.dofus.bot.core.manager.ui.UIPoint

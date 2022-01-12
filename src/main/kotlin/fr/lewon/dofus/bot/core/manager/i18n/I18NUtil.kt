@@ -54,6 +54,10 @@ object I18NUtil {
         }
     }
 
+    fun hasLabel(key: Int): Boolean {
+        return indexes[key] != null
+    }
+
     fun getLabel(key: Int): String {
         val pointer = indexes[key] ?: error("Couldn't find resource with id : $key")
         d2iStream.setPosition(pointer)
