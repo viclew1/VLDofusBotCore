@@ -20,10 +20,12 @@ object TransportSortingUtil {
 
     private fun getAccountTaxiData(): HashMap<*, *> {
         return DatUtil.getDatFileContent("AccountModule_Ankama_Taxi.dat", HashMap::class.java)
+            ?: HashMap<Any, Any>()
     }
 
     private fun getTaxiData(): HashMap<*, *> {
         return DatUtil.getDatFileContent("Module_Ankama_Taxi.dat", HashMap::class.java)
+            ?: HashMap<Any, Any>()
     }
 
     fun getFavoriteZaapMapIds(): List<Double> {

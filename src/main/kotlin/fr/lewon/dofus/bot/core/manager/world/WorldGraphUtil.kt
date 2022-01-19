@@ -1,6 +1,7 @@
 package fr.lewon.dofus.bot.core.manager.world
 
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.core.model.charac.DofusCharacterBasicInfo
 import fr.lewon.dofus.bot.core.model.maps.DofusMap
 import java.util.*
 
@@ -21,6 +22,7 @@ object WorldGraphUtil {
             val transitionCount = stream.readInt()
             for (j in 0 until transitionCount) {
                 val transition = Transition(
+                    edge,
                     stream.readUnsignedByte(),
                     TransitionType.fromInt(stream.readUnsignedByte()),
                     stream.readInt(),
@@ -53,7 +55,9 @@ object WorldGraphUtil {
         return mapVertices.computeIfAbsent(zone) { Vertex(mapId, zone, vertexUid++) }
     }
 
-    fun getPath(fromMap: DofusMap, fromZone: Int, toMaps: List<DofusMap>): List<Transition>? {
+    fun getPath(
+        fromMap: DofusMap, fromZone: Int, toMaps: List<DofusMap>, characterInfo: DofusCharacterBasicInfo? = null
+    ): List<Transition>? {
         val fromVertex = vertices[fromMap.id]?.get(fromZone) ?: return null
         val toMapsIds = toMaps.map { it.id }
         var destVertices = vertices.entries
@@ -78,7 +82,7 @@ object WorldGraphUtil {
                 }
                 val mapOutgoingEdges = outgoingEdges[node.vertex.uid]
                     ?.filter { !explored.contains(it.to) }
-                    ?.flatMap { buildNodes(node, it) }
+                    ?.flatMap { buildNodes(node, it, characterInfo) }
                     ?.onEach { explored.add(it.vertex) }
                     ?: emptyList()
                 newFrontier.addAll(mapOutgoingEdges)
@@ -88,12 +92,22 @@ object WorldGraphUtil {
         return null
     }
 
-    private fun buildNodes(parentNode: Node, edge: Edge): List<Node> {
-        return getEdgeTransitions(edge).map { Node(parentNode, edge.to, it) }
+    private fun buildNodes(parentNode: Node, edge: Edge, characterInfo: DofusCharacterBasicInfo?): List<Node> {
+        return getEdgeTransitions(edge, characterInfo).map { Node(parentNode, edge.to, it) }
     }
 
-    fun getEdgeTransitions(edge: Edge): List<Transition> {
-        return edge.transitions.filter { it.criterion.isEmpty() }
+    private fun getEdgeTransitions(edge: Edge, characterInfo: DofusCharacterBasicInfo?): List<Transition> {
+        return edge.transitions.filter { isCriterionValid(it.criterion, characterInfo) }
+    }
+
+    private fun isCriterionValid(criterion: String, characterInfo: DofusCharacterBasicInfo?): Boolean {
+        if (criterion.isEmpty()) {
+            return true
+        }
+        if (characterInfo == null) {
+            return false
+        }
+        return false
     }
 
     fun getVertex(mapId: Double, zoneId: Int): Vertex? {

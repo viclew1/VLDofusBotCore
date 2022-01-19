@@ -22,8 +22,7 @@ object DofusUIPositionsManager {
 
     private fun getUIPoint(uiItemKey: String, infoType: String, ctr: String, context: String): UIPoint? {
         val key = buildKey(uiItemKey, infoType, ctr, context)
-        val uiPointByKey = DatUtil.getDatFileContent("Berilia_ui_positions", DofusUIPointByKey::class.java)
-        return uiPointByKey[key]
+        return DatUtil.getDatFileContent("Berilia_ui_positions", DofusUIPointByKey::class.java)?.get(key)
     }
 
     private fun buildKey(uiItemKey: String, infoType: String, ctr: String, context: String): String {

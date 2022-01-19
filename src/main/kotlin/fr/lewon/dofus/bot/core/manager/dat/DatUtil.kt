@@ -7,12 +7,15 @@ import java.io.File
 
 object DatUtil {
 
-    fun <T> getDatFileContent(fileName: String, parseClass: Class<T>): T {
+    fun <T> getDatFileContent(fileName: String, parseClass: Class<T>): T? {
         var fileNameWithExtension = fileName
         if (!fileNameWithExtension.endsWith(".dat")) {
             fileNameWithExtension += ".dat"
         }
         val file = File(VldbFilesUtil.getDofusRoamingDirectory() + "/$fileNameWithExtension")
+        if (!file.exists()) {
+            return null
+        }
         val result = AMF3Reader().read(file.readBytes())
         val objectMapper = ObjectMapper()
         val json = objectMapper.writeValueAsString(result)
