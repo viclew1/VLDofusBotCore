@@ -1,13 +1,12 @@
 package fr.lewon.dofus.bot.core
 
+import fr.lewon.dofus.bot.core.d2o.D2OUtil
+import fr.lewon.dofus.bot.core.d2p.elem.D2PElementsAdapter
+import fr.lewon.dofus.bot.core.d2p.maps.D2PMapsAdapter
+import fr.lewon.dofus.bot.core.i18n.I18NUtil
 import fr.lewon.dofus.bot.core.io.gamefiles.VldbFilesUtil
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
-import fr.lewon.dofus.bot.core.manager.VldbManager
-import fr.lewon.dofus.bot.core.manager.d2o.D2OUtil
-import fr.lewon.dofus.bot.core.manager.d2p.elem.D2PElementsAdapter
-import fr.lewon.dofus.bot.core.manager.d2p.maps.D2PMapsAdapter
-import fr.lewon.dofus.bot.core.manager.i18n.I18NUtil
-import fr.lewon.dofus.bot.core.manager.world.WorldGraphUtil
+import fr.lewon.dofus.bot.core.world.WorldGraphUtil
 import org.reflections.Reflections
 import java.io.File
 
@@ -48,7 +47,10 @@ object VldbCoreInitializer {
         managers.forEach { initManager(it, initializedManagers) }
     }
 
-    private fun initManager(manager: VldbManager, initializedManagers: ArrayList<VldbManager>) {
+    private fun initManager(
+        manager: VldbManager,
+        initializedManagers: ArrayList<VldbManager>
+    ) {
         manager.getNeededManagers().forEach {
             initManager(it, initializedManagers)
         }
