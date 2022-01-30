@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.d2o.managers
+package fr.lewon.dofus.bot.core.d2o.managers.map
 
 import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
@@ -17,7 +17,7 @@ object SubAreaManager : VldbManager {
             val isConquestVillage = it["isConquestVillage"].toString().toBoolean()
             val associatedZaapMapId = it["associatedZaapMapId"].toString().toDouble()
             val nameId = it["nameId"].toString().toInt()
-            val name = I18NUtil.getLabel(nameId)
+            val name = I18NUtil.getLabel(nameId) ?: "UNKNOWN_SUB_AREA_NAME"
             val areaId = it["areaId"].toString().toDouble()
             val area = AreaManager.getArea(areaId)
             id to DofusSubArea(id, worldMapId, packId, isConquestVillage, associatedZaapMapId, name, area)

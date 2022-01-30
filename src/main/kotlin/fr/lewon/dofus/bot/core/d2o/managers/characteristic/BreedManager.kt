@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.d2o.managers
+package fr.lewon.dofus.bot.core.d2o.managers.characteristic
 
 import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
@@ -13,7 +13,7 @@ object BreedManager : VldbManager {
         breedById = D2OUtil.getObjects("Breeds").associate {
             val id = it["id"].toString().toInt()
             val nameId = it["shortNameId"].toString().toInt()
-            id to DofusBreed(id, I18NUtil.getLabel(nameId))
+            id to DofusBreed(id, I18NUtil.getLabel(nameId) ?: "UNKNOWN_BREED_NAME")
         }
     }
 

@@ -1,0 +1,25 @@
+package fr.lewon.dofus.bot.core.model.spell
+
+data class DofusSpellLevel(
+    val id: Int,
+    val criticalHitProbability: Int,
+    val needFreeCell: Boolean,
+    val needTakenCell: Boolean,
+    val maxRange: Int,
+    val minRange: Int,
+    val castInLine: Boolean,
+    val rangeCanBeBoosted: Boolean,
+    val apCost: Int,
+    val castInDiagonal: Boolean,
+    val initialCooldown: Int,
+    val castTestLos: Boolean,
+    val minCastInterval: Int,
+    val maxStack: Int,
+    val grade: Int,
+    val minPlayerLevel: Int,
+    val maxCastPerTarget: Int,
+    val maxCastPerTurn: Int,
+    val forClientOnly: Boolean,
+    val effects: List<DofusSpellEffect>,
+    val criticalEffects: List<DofusSpellEffect>,
+)

@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.d2o.managers
+package fr.lewon.dofus.bot.core.d2o.managers.hunt
 
 import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
@@ -13,7 +13,7 @@ object PointOfInterestManager : VldbManager {
         poiById = D2OUtil.getObjects("PointOfInterest").associate {
             val id = it["id"].toString().toInt()
             val labelId = it["nameId"].toString().toInt()
-            val label = I18NUtil.getLabel(labelId)
+            val label = I18NUtil.getLabel(labelId) ?: "UNKNOWN POI LABEL"
             id to DofusPointOfInterest(id, label)
         }
     }

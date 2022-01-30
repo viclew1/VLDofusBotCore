@@ -1,18 +1,11 @@
 package fr.lewon.dofus.bot.core.model.move
 
-enum class Direction(
-    val directionInt: Int,
-    private val reverseDirFetcher: () -> Direction
-) {
+enum class Direction(val directionInt: Int) {
 
-    LEFT(4, { RIGHT }),
-    RIGHT(0, { LEFT }),
-    BOTTOM(2, { TOP }),
-    TOP(6, { BOTTOM });
-
-    fun getReverseDir(): Direction {
-        return reverseDirFetcher()
-    }
+    LEFT(4),
+    RIGHT(0),
+    BOTTOM(2),
+    TOP(6);
 
     companion object {
         fun fromInt(directionInt: Int): Direction {

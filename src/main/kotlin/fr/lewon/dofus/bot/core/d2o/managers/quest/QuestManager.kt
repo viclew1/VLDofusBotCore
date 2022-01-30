@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.d2o.managers
+package fr.lewon.dofus.bot.core.d2o.managers.quest
 
 import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil

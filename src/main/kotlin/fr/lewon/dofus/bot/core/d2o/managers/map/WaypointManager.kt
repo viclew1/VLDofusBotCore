@@ -1,22 +1,22 @@
-package fr.lewon.dofus.bot.core.d2o.managers
+package fr.lewon.dofus.bot.core.d2o.managers.map
 
 import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
 import fr.lewon.dofus.bot.core.model.maps.DofusMap
 
-object WaypointsManager : VldbManager {
+object WaypointManager : VldbManager {
 
-    lateinit var waypointsIds: List<Double>
+    lateinit var waypoints: List<DofusMap>
 
     override fun initManager() {
         val objects = D2OUtil.getObjects("Waypoints")
-        waypointsIds = objects.filter { it["activated"].toString().toBoolean() }
+        waypoints = objects.filter { it["activated"].toString().toBoolean() }
             .filter { !isSubAreaConquest(it["subAreaId"].toString().toDouble()) }
-            .map { it["mapId"].toString().toDouble() }
+            .map { MapManager.getDofusMap(it["mapId"].toString().toDouble()) }
     }
 
     override fun getNeededManagers(): List<VldbManager> {
-        return emptyList()
+        return listOf(MapManager)
     }
 
     private fun isSubAreaConquest(subAreaId: Double): Boolean {
@@ -24,7 +24,7 @@ object WaypointsManager : VldbManager {
     }
 
     fun getAllZaapMaps(): List<DofusMap> {
-        return waypointsIds.map { MapManager.getDofusMap(it) }
+        return ArrayList(waypoints)
     }
 
 }

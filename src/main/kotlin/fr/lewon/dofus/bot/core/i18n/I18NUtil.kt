@@ -58,8 +58,8 @@ object I18NUtil {
         return indexes[key] != null
     }
 
-    fun getLabel(key: Int): String {
-        val pointer = indexes[key] ?: error("Couldn't find resource with id : $key")
+    fun getLabel(key: Int): String? {
+        val pointer = indexes[key] ?: return null
         d2iStream.setPosition(pointer)
         return d2iStream.readUTF()
     }

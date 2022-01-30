@@ -1,11 +1,11 @@
-package fr.lewon.dofus.bot.core.d2o.managers
+package fr.lewon.dofus.bot.core.d2o.managers.interactive
 
 import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
 import fr.lewon.dofus.bot.core.i18n.I18NUtil
 import fr.lewon.dofus.bot.core.model.interactive.DofusSkill
 
-object SkillsManager : VldbManager {
+object SkillManager : VldbManager {
 
     private lateinit var skillById: Map<Double, DofusSkill>
 
@@ -14,7 +14,7 @@ object SkillsManager : VldbManager {
             val id = it["id"].toString().toDouble()
             val elementActionId = it["elementActionId"].toString().toInt()
             val nameId = it["nameId"].toString().toInt()
-            val label = if (I18NUtil.hasLabel(nameId)) I18NUtil.getLabel(nameId) else "UNKNOWN_SKILL_LABEL"
+            val label = I18NUtil.getLabel(nameId) ?: "UNKNOWN_SKILL_LABEL"
             id to DofusSkill(id, elementActionId, label)
         }
     }
