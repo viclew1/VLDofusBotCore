@@ -1,13 +1,9 @@
 package fr.lewon.dofus.bot.core.logs
 
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 
-class VldbLogger(
-    private val minLogLevel: LogLevel = LogLevel.INFO,
-    logItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY
-) {
+class VldbLogger(logItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY) {
 
     companion object {
         const val DEFAULT_LOG_ITEM_CAPACITY = 8
@@ -17,8 +13,8 @@ class VldbLogger(
     val listeners = ArrayList<VldbLoggerListener>()
 
     private fun onLogsChange() {
-        val filteredLogs = logs.filter { it.logLevel.level >= minLogLevel.level }
-        listeners.forEach { it.onLogsChange(filteredLogs) }
+        val logsCopy = logs.toList()
+        listeners.forEach { it.onLogsChange(logsCopy) }
     }
 
     fun clearLogs() {
@@ -46,50 +42,22 @@ class VldbLogger(
     }
 
     fun addSubLog(message: String, parent: LogItem, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
-        val newItem = LogItem(message, parent.logLevel, subItemCapacity)
+        val newItem = LogItem(message, subItemCapacity)
         parent.addSubItem(newItem)
         onLogsChange()
         return newItem
     }
 
-    fun log(
-        message: String,
-        logLevel: LogLevel = LogLevel.DEBUG,
-        subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY
-    ): LogItem {
+    fun log(message: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
         synchronized(logs) {
-            val newItem = LogItem(message, logLevel, subItemCapacity)
-            if (logLevel.level >= minLogLevel.level) {
-                val ts = SimpleDateFormat("HH:mm:ss.SSS").format(Date())
-                //println("$ts - [${logLevel.name}] - $message")
-                if (!logs.offer(newItem)) {
-                    logs.poll()
-                    logs.offer(newItem)
-                    onLogsChange()
-                }
+            val newItem = LogItem(message, subItemCapacity)
+            if (!logs.offer(newItem)) {
+                logs.poll()
+                logs.offer(newItem)
+                onLogsChange()
             }
             return newItem
         }
-    }
-
-    fun trace(str: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
-        return log(str, LogLevel.TRACE, subItemCapacity)
-    }
-
-    fun debug(str: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
-        return log(str, LogLevel.DEBUG, subItemCapacity)
-    }
-
-    fun info(str: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
-        return log(str, LogLevel.INFO, subItemCapacity)
-    }
-
-    fun warn(str: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
-        return log(str, LogLevel.WARN, subItemCapacity)
-    }
-
-    fun error(str: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
-        return log(str, LogLevel.ERROR, subItemCapacity)
     }
 
 }
