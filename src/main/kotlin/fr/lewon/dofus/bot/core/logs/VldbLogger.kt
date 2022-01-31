@@ -3,7 +3,7 @@ package fr.lewon.dofus.bot.core.logs
 import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 
-class VldbLogger(logItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY) {
+class VldbLogger(val logItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY) {
 
     companion object {
         const val DEFAULT_LOG_ITEM_CAPACITY = 8
@@ -41,16 +41,20 @@ class VldbLogger(logItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY) {
         }
     }
 
-    fun addSubLog(message: String, parent: LogItem, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
-        val newItem = LogItem(message, subItemCapacity)
-        parent.addSubItem(newItem)
-        onLogsChange()
-        return newItem
+    fun addSubLog(
+        message: String, parent: LogItem, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY
+    ): LogItem {
+        synchronized(logs) {
+            val newItem = LogItem(message, "", subItemCapacity)
+            parent.addSubItem(newItem)
+            onLogsChange()
+            return newItem
+        }
     }
 
-    fun log(message: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY): LogItem {
+    fun log(message: String, subItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY, description: String = ""): LogItem {
         synchronized(logs) {
-            val newItem = LogItem(message, subItemCapacity)
+            val newItem = LogItem(message, description, subItemCapacity)
             if (!logs.offer(newItem)) {
                 logs.poll()
                 logs.offer(newItem)
