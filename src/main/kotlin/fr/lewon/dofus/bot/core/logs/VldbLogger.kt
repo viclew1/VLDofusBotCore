@@ -54,8 +54,8 @@ class VldbLogger(logItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY) {
             if (!logs.offer(newItem)) {
                 logs.poll()
                 logs.offer(newItem)
-                onLogsChange()
             }
+            onLogsChange()
             return newItem
         }
     }
