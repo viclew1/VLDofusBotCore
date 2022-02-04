@@ -32,4 +32,8 @@ object CharacteristicManager : VldbManager {
         return characteristicById[id]
     }
 
+    fun getCharacteristicByKeyword(keyWord: String): DofusCharacteristic? {
+        return characteristicByKeyword[keyWord]
+    }
+
 }

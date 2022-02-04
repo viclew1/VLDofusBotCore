@@ -23,8 +23,8 @@ object SpellManager : VldbManager {
         return listOf(SpellLevelManager)
     }
 
-    fun getSpell(id: Int): DofusSpell {
-        return spellById[id] ?: error("No spell for id : $id")
+    fun getSpell(id: Int): DofusSpell? {
+        return spellById[id]
     }
 
 }

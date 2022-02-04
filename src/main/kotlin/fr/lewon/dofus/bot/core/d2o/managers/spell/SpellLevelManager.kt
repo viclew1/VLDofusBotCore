@@ -11,13 +11,13 @@ object SpellLevelManager : VldbManager {
     override fun initManager() {
         spellLevelById = D2OUtil.getObjects("SpellLevels").associate {
             val id = it["id"].toString().toInt()
-            val criticalHitProbability = it["id"].toString().toInt()
+            val criticalHitProbability = it["criticalHitProbability"].toString().toInt()
             val needFreeCell = it["needFreeCell"].toString().toBoolean()
             val needTakenCell = it["needTakenCell"].toString().toBoolean()
             val maxRange = it["range"].toString().toInt()
             val minRange = it["minRange"].toString().toInt()
             val castInLine = it["castInLine"].toString().toBoolean()
-            val rangeCanBeBoosted = it["castInLine"].toString().toBoolean()
+            val rangeCanBeBoosted = it["rangeCanBeBoosted"].toString().toBoolean()
             val apCost = it["apCost"].toString().toInt()
             val castInDiagonal = it["castInDiagonal"].toString().toBoolean()
             val initialCooldown = it["initialCooldown"].toString().toInt()

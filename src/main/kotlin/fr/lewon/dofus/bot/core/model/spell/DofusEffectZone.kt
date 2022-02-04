@@ -1,6 +1,6 @@
 package fr.lewon.dofus.bot.core.model.spell
 
 data class DofusEffectZone(
-    val effectZoneType: DofusEffectZoneType,
-    val size: Int
+    var effectZoneType: DofusEffectZoneType = DofusEffectZoneType.POINT,
+    var size: Int = 1
 )

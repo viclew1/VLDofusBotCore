@@ -1,7 +1,7 @@
 package fr.lewon.dofus.bot.core.model.spell
 
 data class DofusSpell(
-    val id: Int,
-    val name: String,
-    val levels: List<DofusSpellLevel>
+    val id: Int = -1,
+    val name: String = "CUSTOM_SPELL",
+    val levels: List<DofusSpellLevel> = listOf(DofusSpellLevel())
 )

@@ -2,7 +2,10 @@ package fr.lewon.dofus.bot.core.d2o.managers.entity
 
 import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
+import fr.lewon.dofus.bot.core.d2o.managers.characteristic.CharacteristicManager
+import fr.lewon.dofus.bot.core.d2o.managers.spell.SpellManager
 import fr.lewon.dofus.bot.core.i18n.I18NUtil
+import fr.lewon.dofus.bot.core.model.charac.DofusCharacteristic
 import fr.lewon.dofus.bot.core.model.entity.DofusMonster
 
 object MonsterManager : VldbManager {
@@ -15,12 +18,33 @@ object MonsterManager : VldbManager {
             val nameId = it["nameId"].toString().toInt()
             val name = I18NUtil.getLabel(nameId) ?: "UNKNOWN_MONSTER_NAME"
             val isMiniBoss = it["isMiniBoss"].toString().toBoolean()
-            id to DofusMonster(id, name, isMiniBoss)
+            val spellsIds = it["spells"] as List<Int>
+            val spells = spellsIds.mapNotNull { spellId -> SpellManager.getSpell(spellId) }
+            val grades = it["grades"] as List<Map<Any, Any>>
+            val baseStats = getBaseStats(grades.lastOrNull())
+            id to DofusMonster(id, name, isMiniBoss, spells, baseStats)
         }
     }
 
+    private fun getBaseStats(grade: Map<Any, Any>?): Map<DofusCharacteristic, Int> {
+        val baseStats = HashMap<DofusCharacteristic, Int>()
+        grade ?: return baseStats
+        grade.entries.forEach {
+            val keyStr = it.key.toString()
+            if (keyStr == "bonusCharacteristics") {
+                baseStats.putAll(getBaseStats(it.value as Map<Any, Any>))
+            } else {
+                val characteristic = CharacteristicManager.getCharacteristicByKeyword(keyStr)
+                if (characteristic != null) {
+                    baseStats[characteristic] = it.value.toString().toInt()
+                }
+            }
+        }
+        return baseStats
+    }
+
     override fun getNeededManagers(): List<VldbManager> {
-        return emptyList()
+        return listOf(SpellManager, CharacteristicManager)
     }
 
     fun getMonster(monsterId: Double): DofusMonster {
