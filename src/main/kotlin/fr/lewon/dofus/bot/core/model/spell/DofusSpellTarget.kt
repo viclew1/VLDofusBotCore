@@ -7,7 +7,16 @@ enum class DofusSpellTarget(val targetMask: String) {
 
     companion object {
         fun fromString(targetMask: String): DofusSpellTarget? {
-            return values().firstOrNull { it.targetMask == targetMask }
+            val targets = targetMask.split(",")
+            return if (targets.contains(ALLIES_ONLY.targetMask) && targets.contains(ENEMIES_ONLY.targetMask)) {
+                EVERYBODY
+            } else if (targets.contains(ALLIES_ONLY.targetMask)) {
+                ALLIES_ONLY
+            } else if (targets.contains(ENEMIES_ONLY.targetMask)) {
+                ENEMIES_ONLY
+            } else {
+                null
+            }
         }
     }
 }
