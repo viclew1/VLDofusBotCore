@@ -20,6 +20,10 @@ object D2OUtil {
         return classes[classId] ?: error("No class definition for classId : $classId")
     }
 
+    fun getModuleNames(): List<String> {
+        return streamsByModuleName.keys.toList()
+    }
+
     fun getObjects(moduleName: String): List<Map<String, Any>> {
         try {
             lock.lockInterruptibly()

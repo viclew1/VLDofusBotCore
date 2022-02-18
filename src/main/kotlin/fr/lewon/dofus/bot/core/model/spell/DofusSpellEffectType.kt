@@ -15,8 +15,9 @@ enum class DofusSpellEffectType(val id: Int, val globalType: DofusSpellEffectGlo
     PUSH(5, DofusSpellEffectGlobalType.MOVE),
     PULL(6, DofusSpellEffectGlobalType.MOVE),
     SWITCH_POSITIONS(8, DofusSpellEffectGlobalType.MOVE),
-    MP_BUFF(128, DofusSpellEffectGlobalType.BUFF),
-    DASH(1042, DofusSpellEffectGlobalType.MOVE);
+    DASH(1042, DofusSpellEffectGlobalType.MOVE),
+    CRITICAL_BUFF(115, DofusSpellEffectGlobalType.BUFF),
+    MP_BUFF(128, DofusSpellEffectGlobalType.BUFF);
 
     companion object {
         fun fromEffectId(id: Int): DofusSpellEffectType? {
