@@ -1,6 +1,5 @@
 package fr.lewon.dofus.bot.core.d2p.maps
 
-import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import fr.lewon.dofus.bot.core.d2p.AbstractD2PUrlLoaderAdapter
 import fr.lewon.dofus.bot.core.d2p.D2PIndex
 import fr.lewon.dofus.bot.core.d2p.maps.cell.Cell
@@ -10,7 +9,9 @@ import fr.lewon.dofus.bot.core.d2p.maps.element.BasicElement
 import fr.lewon.dofus.bot.core.d2p.maps.element.ElementType
 import fr.lewon.dofus.bot.core.d2p.maps.element.GraphicalElement
 import fr.lewon.dofus.bot.core.d2p.maps.element.SoundElement
+import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import java.io.File
+import java.nio.charset.Charset
 import kotlin.experimental.xor
 
 object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
@@ -20,12 +21,15 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
     private val indexes = HashMap<Double, D2PIndex>()
     private val properties = HashMap<String, String>()
 
-    fun getCompleteCellDataByCellId(mapId: Double, key: String): HashMap<Int, CompleteCellData> {
+    lateinit var DECRYPTION_KEY: String
+    lateinit var DECRYPTION_KEY_CHARSET: String
+
+    fun getCompleteCellDataByCellId(mapId: Double): HashMap<Int, CompleteCellData> {
         val index = indexes[mapId] ?: error("Missing map : $mapId")
         val fileStream = index.stream
         fileStream.setPosition(index.offset)
         val data = fileStream.readNBytes(index.length)
-        return deserialize(loadFromData(data), key.toByteArray())
+        return deserialize(loadFromData(data))
     }
 
     override fun initStream(path: String) {
@@ -81,7 +85,7 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
             ?: error("Invalid key")
     }
 
-    private fun deserialize(bar: ByteArrayReader, decryptionKey: ByteArray): HashMap<Int, CompleteCellData> {
+    private fun deserialize(bar: ByteArrayReader): HashMap<Int, CompleteCellData> {
         var stream = bar
         val header = stream.readByte().toInt()
         if (header != loaderHeader) {
@@ -95,6 +99,7 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
             val dataLen = stream.readInt()
             if (encrypted) {
                 val encryptedData = stream.readNBytes(dataLen)
+                val decryptionKey = DECRYPTION_KEY.toByteArray(Charset.forName(DECRYPTION_KEY_CHARSET))
                 for (i in encryptedData.indices) {
                     encryptedData[i] = encryptedData[i] xor decryptionKey[i % decryptionKey.size]
                 }

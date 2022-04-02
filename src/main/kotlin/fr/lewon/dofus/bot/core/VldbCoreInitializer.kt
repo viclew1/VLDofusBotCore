@@ -12,10 +12,10 @@ import java.io.File
 
 object VldbCoreInitializer {
 
-    fun initAll() {
+    fun initAll(mapsDecryptionKey: String, mapsDecryptionKeyCharset: String) {
         processInitialization({ I18NUtil.init() }, "Initializing I18N ... ")
         processInitialization({ initAllD2O() }, "Initializing D2O ... ")
-        processInitialization({ initAllD2P() }, "Initializing D2P ... ")
+        processInitialization({ initAllD2P(mapsDecryptionKey, mapsDecryptionKeyCharset) }, "Initializing D2P ... ")
         processInitialization({ initVldbManagers() }, "Initializing VLDB managers ... \n")
         processInitialization({ initWorldGraph() }, "Initializing world graph ... ")
     }
@@ -28,13 +28,15 @@ object VldbCoreInitializer {
             ?: error("Maps directory not found : $d2oPath}")
     }
 
-    private fun initAllD2P() {
+    private fun initAllD2P(mapsDecryptionKey: String, mapsDecryptionKeyCharset: String) {
         val mapsPath = "${VldbFilesUtil.getDofusDirectory()}/content/maps"
         D2PElementsAdapter.initStream("$mapsPath/elements.ele")
         File(mapsPath).listFiles()
             ?.filter { it.absolutePath.endsWith(".d2p") }
             ?.forEach { D2PMapsAdapter.initStream(it.absolutePath) }
             ?: error("Maps directory not found : $mapsPath}")
+        D2PMapsAdapter.DECRYPTION_KEY = mapsDecryptionKey
+        D2PMapsAdapter.DECRYPTION_KEY_CHARSET = mapsDecryptionKeyCharset
     }
 
     private fun initVldbManagers() {
