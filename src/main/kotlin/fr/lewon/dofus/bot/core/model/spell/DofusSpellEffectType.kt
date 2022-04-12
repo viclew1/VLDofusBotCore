@@ -1,27 +1,30 @@
 package fr.lewon.dofus.bot.core.model.spell
 
-enum class DofusSpellEffectType(val id: Int, val globalType: DofusSpellEffectGlobalType) {
-    WATER_DAMAGE(96, DofusSpellEffectGlobalType.ATTACK),
-    EARTH_DAMAGE(97, DofusSpellEffectGlobalType.ATTACK),
-    AIR_DAMAGE(98, DofusSpellEffectGlobalType.ATTACK),
-    FIRE_DAMAGE(99, DofusSpellEffectGlobalType.ATTACK),
-    NEUTRAL_DAMAGE(100, DofusSpellEffectGlobalType.ATTACK),
-    WATER_LIFE_STEAL(91, DofusSpellEffectGlobalType.ATTACK),
-    EARTH_LIFE_STEAL(92, DofusSpellEffectGlobalType.ATTACK),
-    AIR_LIFE_STEAL(93, DofusSpellEffectGlobalType.ATTACK),
-    FIRE_LIFE_STEAL(94, DofusSpellEffectGlobalType.ATTACK),
-    NEUTRAL_LIFE_STEAL(95, DofusSpellEffectGlobalType.ATTACK),
-    TELEPORT(4, DofusSpellEffectGlobalType.MOVE),
-    PUSH(5, DofusSpellEffectGlobalType.MOVE),
-    PULL(6, DofusSpellEffectGlobalType.MOVE),
-    SWITCH_POSITIONS(8, DofusSpellEffectGlobalType.MOVE),
-    DASH(1042, DofusSpellEffectGlobalType.MOVE),
-    CRITICAL_BUFF(115, DofusSpellEffectGlobalType.BUFF),
-    MP_BUFF(128, DofusSpellEffectGlobalType.BUFF);
+enum class DofusSpellEffectType(val globalType: DofusSpellEffectGlobalType, private vararg val ids: Int) {
+    WATER_DAMAGE(DofusSpellEffectGlobalType.ATTACK, 96),
+    EARTH_DAMAGE(DofusSpellEffectGlobalType.ATTACK, 97),
+    AIR_DAMAGE(DofusSpellEffectGlobalType.ATTACK, 98),
+    FIRE_DAMAGE(DofusSpellEffectGlobalType.ATTACK, 99),
+    NEUTRAL_DAMAGE(DofusSpellEffectGlobalType.ATTACK, 100),
+    WATER_LIFE_STEAL(DofusSpellEffectGlobalType.ATTACK, 91),
+    EARTH_LIFE_STEAL(DofusSpellEffectGlobalType.ATTACK, 92),
+    AIR_LIFE_STEAL(DofusSpellEffectGlobalType.ATTACK, 93),
+    FIRE_LIFE_STEAL(DofusSpellEffectGlobalType.ATTACK, 94),
+    NEUTRAL_LIFE_STEAL(DofusSpellEffectGlobalType.ATTACK, 95),
+    MP_DECREASED_EARTH_DAMAGE(DofusSpellEffectGlobalType.ATTACK, 1016),
+    TELEPORT(DofusSpellEffectGlobalType.MOVE, 4),
+    PUSH(DofusSpellEffectGlobalType.MOVE, 5),
+    PULL(DofusSpellEffectGlobalType.MOVE, 6),
+    SWITCH_POSITIONS(DofusSpellEffectGlobalType.MOVE, 8),
+    DASH(DofusSpellEffectGlobalType.MOVE, 1042),
+    DAMAGE_BUFF(DofusSpellEffectGlobalType.BUFF, 112),
+    CRITICAL_BUFF(DofusSpellEffectGlobalType.BUFF, 115),
+    MP_BUFF(DofusSpellEffectGlobalType.BUFF, 128),
+    POWER_BUFF(DofusSpellEffectGlobalType.BUFF, 138, 1054);
 
     companion object {
         fun fromEffectId(id: Int): DofusSpellEffectType? {
-            return values().firstOrNull { it.id == id }
+            return values().firstOrNull { it.ids.contains(id) }
         }
     }
 }

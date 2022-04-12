@@ -11,6 +11,7 @@ object SpellLevelManager : VldbManager {
     override fun initManager() {
         spellLevelById = D2OUtil.getObjects("SpellLevels").associate {
             val id = it["id"].toString().toInt()
+            val spellId = it["spellId"].toString().toInt()
             val criticalHitProbability = it["criticalHitProbability"].toString().toInt()
             val needFreeCell = it["needFreeCell"].toString().toBoolean()
             val needTakenCell = it["needTakenCell"].toString().toBoolean()
@@ -32,7 +33,7 @@ object SpellLevelManager : VldbManager {
             val effects = parseEffects(it["effects"] as List<Map<String, Any>>?)
             val criticalEffects = parseEffects(it["criticalEffect"] as List<Map<String, Any>>?)
             id to DofusSpellLevel(
-                id, criticalHitProbability, needFreeCell, needTakenCell, maxRange, minRange, castInLine,
+                id, spellId, criticalHitProbability, needFreeCell, needTakenCell, maxRange, minRange, castInLine,
                 rangeCanBeBoosted, apCost, castInDiagonal, initialCooldown, castTestLos, minCastInterval,
                 maxStack, grade, minPlayerLevel, maxCastPerTarget, maxCastPerTurn, forClientOnly,
                 effects, criticalEffects

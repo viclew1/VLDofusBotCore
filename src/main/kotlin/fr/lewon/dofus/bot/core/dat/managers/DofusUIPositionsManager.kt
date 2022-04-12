@@ -20,6 +20,10 @@ object DofusUIPositionsManager {
         return getUIPoint("treasureHunt", "pos", "ctr_hunt", CONTEXT_DEFAULT)
     }
 
+    fun getArenaUiPosition(): UIPoint? {
+        return getUIPoint("pvpArena", "pos", "window827", CONTEXT_DEFAULT)
+    }
+
     private fun getUIPoint(uiItemKey: String, infoType: String, ctr: String, context: String): UIPoint? {
         val key = buildKey(uiItemKey, infoType, ctr, context)
         return DatUtil.getDatFileContent("Berilia_ui_positions", DofusUIPointByKey::class.java)?.get(key)

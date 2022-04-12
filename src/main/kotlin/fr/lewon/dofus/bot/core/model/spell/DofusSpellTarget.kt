@@ -1,18 +1,18 @@
 package fr.lewon.dofus.bot.core.model.spell
 
-enum class DofusSpellTarget(val targetMask: String) {
-    ALLIES_ONLY("a"),
-    ENEMIES_ONLY("A"),
-    EVERYBODY("a,A");
+enum class DofusSpellTarget {
+    ALLIES_ONLY,
+    ENEMIES_ONLY,
+    EVERYBODY;
 
     companion object {
         fun fromString(targetMask: String): DofusSpellTarget? {
             val targets = targetMask.split(",")
-            return if (targets.contains(ALLIES_ONLY.targetMask) && targets.contains(ENEMIES_ONLY.targetMask)) {
+            return if (targets.contains("a") && targets.contains("A") || targets.contains("L") && targets.contains("M")) {
                 EVERYBODY
-            } else if (targets.contains(ALLIES_ONLY.targetMask)) {
+            } else if (targets.contains("a")) {
                 ALLIES_ONLY
-            } else if (targets.contains(ENEMIES_ONLY.targetMask)) {
+            } else if (targets.contains("A")) {
                 ENEMIES_ONLY
             } else {
                 null

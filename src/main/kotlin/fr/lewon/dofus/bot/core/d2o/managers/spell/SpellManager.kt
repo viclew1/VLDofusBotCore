@@ -12,10 +12,11 @@ object SpellManager : VldbManager {
     override fun initManager() {
         spellById = D2OUtil.getObjects("Spells").associate {
             val id = it["id"].toString().toInt()
+            val iconId = it["iconId"].toString().toInt()
             val name = I18NUtil.getLabel(it["nameId"].toString().toInt()) ?: "UNKNOWN_SPELL_NAME"
             val levelIds = it["spellLevels"] as List<Int>
             val levels = levelIds.map { lvlId -> SpellLevelManager.getSpellLevel(lvlId) }
-            id to DofusSpell(id, name, levels)
+            id to DofusSpell(id, iconId, name, levels)
         }
     }
 

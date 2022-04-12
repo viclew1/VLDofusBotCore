@@ -2,6 +2,7 @@ package fr.lewon.dofus.bot.core.model.spell
 
 data class DofusSpellLevel(
     var id: Int = 0,
+    var spellId: Int = 0,
     var criticalHitProbability: Int = 0,
     var needFreeCell: Boolean = false,
     var needTakenCell: Boolean = false,
