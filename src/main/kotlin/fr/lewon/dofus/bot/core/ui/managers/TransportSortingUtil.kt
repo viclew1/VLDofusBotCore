@@ -1,21 +1,26 @@
-package fr.lewon.dofus.bot.core.dat.managers
+package fr.lewon.dofus.bot.core.ui.managers
 
-import fr.lewon.dofus.bot.core.dat.DatUtil
+import fr.lewon.dofus.bot.core.ui.dat.DatUtil
 
 object TransportSortingUtil {
 
     fun getZaapSortingMode(): SortingMode {
-        val taxiData = getAccountTaxiData()
-        val sortCriteria = taxiData["zaapSelection_sortCriteria"].toString()
-        val descendingSort = taxiData["zaapSelection_descendingSort"].toString().toBoolean()
-        return SortingMode(sortCriteria, descendingSort)
+        return getSortingMode("zaapSelection_sortCriteria", "zaapSelection_descendingSort")
     }
 
     fun getZaapiSortingMode(): SortingMode {
+        return getSortingMode("zaapiSelection_sortCriteria", "zaapiSelection_descendingSort")
+    }
+
+    private fun getSortingMode(sortCriteriaKey: String, descendingSortKey: String): SortingMode {
         val taxiData = getAccountTaxiData()
-        val sortCriteria = taxiData["zaapiSelection_sortCriteria"].toString()
-        val descendingSort = taxiData["zaapiSelection_descendingSort"].toString().toBoolean()
+        val sortCriteria = taxiData[sortCriteriaKey].toString()
+        val descendingSort = taxiData[descendingSortKey].toString().toBoolean()
         return SortingMode(sortCriteria, descendingSort)
+    }
+
+    fun getFavoriteZaapMapIds(): List<Double> {
+        return getTaxiData()["favoriteZap"] as List<Double>? ?: emptyList()
     }
 
     private fun getAccountTaxiData(): HashMap<*, *> {
@@ -26,10 +31,6 @@ object TransportSortingUtil {
     private fun getTaxiData(): HashMap<*, *> {
         return DatUtil.getDatFileContent("Module_Ankama_Taxi.dat", HashMap::class.java)
             ?: HashMap<Any, Any>()
-    }
-
-    fun getFavoriteZaapMapIds(): List<Double> {
-        return getTaxiData()["favoriteZap"] as List<Double>? ?: emptyList()
     }
 
     data class SortingMode(val sortCriteria: String, val descendingSort: Boolean)

@@ -1,8 +1,8 @@
-package fr.lewon.dofus.bot.core.dat
+package fr.lewon.dofus.bot.core.ui.dat
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import fr.lewon.dofus.bot.core.io.gamefiles.VldbFilesUtil
-import fr.lewon.dofus.bot.core.dat.amf3.AMF3Reader
+import fr.lewon.dofus.bot.core.ui.dat.amf3.AMF3Reader
 import java.io.File
 
 object DatUtil {

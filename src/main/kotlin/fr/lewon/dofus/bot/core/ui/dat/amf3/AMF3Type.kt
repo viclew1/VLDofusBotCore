@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.dat.amf3
+package fr.lewon.dofus.bot.core.ui.dat.amf3
 
 enum class AMF3Type(private val id: Int) {
 

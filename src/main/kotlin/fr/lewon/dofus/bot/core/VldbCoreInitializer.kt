@@ -6,11 +6,15 @@ import fr.lewon.dofus.bot.core.d2p.maps.D2PMapsAdapter
 import fr.lewon.dofus.bot.core.i18n.I18NUtil
 import fr.lewon.dofus.bot.core.io.gamefiles.VldbFilesUtil
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.core.ui.managers.XmlUiUtil
+import fr.lewon.dofus.bot.core.ui.xml.modele.ui.UiModule
 import fr.lewon.dofus.bot.core.world.WorldGraphUtil
 import org.reflections.Reflections
 import java.io.File
 
 object VldbCoreInitializer {
+
+    var DEBUG = false
 
     fun initAll(mapsDecryptionKey: String, mapsDecryptionKeyCharset: String) {
         processInitialization({ I18NUtil.init() }, "Initializing I18N ... ")
@@ -18,6 +22,8 @@ object VldbCoreInitializer {
         processInitialization({ initAllD2P(mapsDecryptionKey, mapsDecryptionKeyCharset) }, "Initializing D2P ... ")
         processInitialization({ initVldbManagers() }, "Initializing VLDB managers ... \n")
         processInitialization({ initWorldGraph() }, "Initializing world graph ... ")
+        processInitialization({ initUIGroups() }, "Initializing UI Groups ... ")
+        processInitialization({ initUIXml() }, "Initializing UI XML ... ")
     }
 
     private fun initAllD2O() {
@@ -70,6 +76,28 @@ object VldbCoreInitializer {
             error("World graph file not found")
         }
         WorldGraphUtil.init(ByteArrayReader(worldGraphFile.readBytes()))
+    }
+
+    private fun initUIGroups() {
+        val xmlUiPath = "${VldbFilesUtil.getDofusDirectory()}/ui"
+        val subDirs = File(xmlUiPath).listFiles() ?: error("XML directory not found : $xmlUiPath}")
+        for (subDir in subDirs) {
+            val d2uiFile = subDir.listFiles()?.firstOrNull { it.absolutePath.endsWith(".d2ui") }
+                ?: continue
+            UiModule.init(ByteArrayReader(d2uiFile.readBytes()))
+        }
+    }
+
+    private fun initUIXml() {
+        val xmlUiPath = "${VldbFilesUtil.getDofusDirectory()}/ui"
+        val subDirs = File(xmlUiPath).listFiles() ?: error("XML directory not found : $xmlUiPath}")
+        for (subDir in subDirs) {
+            val uiDir = subDir.listFiles()?.firstOrNull { it.isDirectory && it.name.equals("ui") }
+                ?: continue
+            val xmlFiles = uiDir.listFiles()?.filter { it.absolutePath.endsWith(".xml") }
+                ?: error("XML files not found : ${uiDir.absolutePath}")
+            xmlFiles.forEach { XmlUiUtil.init(it) }
+        }
     }
 
     private fun processInitialization(initialization: () -> Unit, startMessage: String) {

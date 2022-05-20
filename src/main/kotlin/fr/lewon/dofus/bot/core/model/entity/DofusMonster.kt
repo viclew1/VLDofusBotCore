@@ -8,5 +8,9 @@ data class DofusMonster(
     val name: String,
     val isMiniBoss: Boolean,
     val spells: List<DofusSpell>,
-    val baseStats: Map<DofusCharacteristic, Int>
+    val baseStats: Map<DofusCharacteristic, Int>,
+    val useSummonSlot: Boolean,
+    val canSwitchPos: Boolean,
+    val canSwitchPosOnTarget: Boolean,
+    val canBePushed: Boolean
 )

@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.dat.amf3
+package fr.lewon.dofus.bot.core.ui.dat.amf3
 
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 

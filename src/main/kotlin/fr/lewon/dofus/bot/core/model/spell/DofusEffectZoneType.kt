@@ -8,7 +8,8 @@ enum class DofusEffectZoneType(val zoneTypeKey: Char) {
     CROSS_FROM_TARGET('Q'),
     DIAGONAL_CROSS('+'),
     LINE('L'),
-    PERPENDICULAR_LINE('T');
+    PERPENDICULAR_LINE('T'),
+    CONE('V');
 
     companion object {
         fun fromKey(zoneTypeKey: Char): DofusEffectZoneType? {
