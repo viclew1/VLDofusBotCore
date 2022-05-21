@@ -18,6 +18,8 @@ object MonsterManager : VldbManager {
             val nameId = it["nameId"].toString().toInt()
             val name = I18NUtil.getLabel(nameId) ?: "UNKNOWN_MONSTER_NAME"
             val isMiniBoss = it["isMiniBoss"].toString().toBoolean()
+            val isBoss = it["isBoss"].toString().toBoolean()
+            val isQuestMonster = it["isQuestMonster"].toString().toBoolean()
             val spellsIds = it["spells"] as List<Int>
             val spells = spellsIds.mapNotNull { spellId -> SpellManager.getSpell(spellId) }
             val grades = it["grades"] as List<Map<Any, Any>>
@@ -27,7 +29,7 @@ object MonsterManager : VldbManager {
             val canBePushed = it["canBePushed"].toString().toBoolean()
             val baseStats = getBaseStats(grades.lastOrNull())
             id to DofusMonster(
-                id, name, isMiniBoss, spells, baseStats, useSummonSlot,
+                id, name, isMiniBoss, isBoss, isQuestMonster, spells, baseStats, useSummonSlot,
                 canSwitchPos, canSwitchPosOnTarget, canBePushed
             )
         }

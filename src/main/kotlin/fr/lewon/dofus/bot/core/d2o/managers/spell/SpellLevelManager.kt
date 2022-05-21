@@ -119,5 +119,5 @@ object SpellLevelManager : VldbManager {
 
 fun main() {
     VldbCoreInitializer.DEBUG = true
-    VldbCoreInitializer.initAll("", "")
+    VldbCoreInitializer.initAll()
 }

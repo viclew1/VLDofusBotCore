@@ -17,7 +17,8 @@ object MapManager : VldbManager {
             val posY = getStringByKey(it, "posY").toInt()
             val subAreaId = getStringByKey(it, "subAreaId").toDouble()
             val subArea = SubAreaManager.getSubArea(subAreaId)
-            val worldMap = getStringByKey(it, "worldMap").toInt()
+            val worldMapId = getStringByKey(it, "worldMap").toInt()
+            val worldMap = WorldMapManager.getWorldMap(worldMapId)
             val isOutdoor = getStringByKey(it, "outdoor").toBoolean()
             val isTransition = getStringByKey(it, "isTransition").toBoolean()
             val hasPriorityOnWorldMap = getStringByKey(it, "hasPriorityOnWorldmap").toBoolean()
@@ -26,7 +27,7 @@ object MapManager : VldbManager {
     }
 
     override fun getNeededManagers(): List<VldbManager> {
-        return listOf(SubAreaManager)
+        return listOf(SubAreaManager, WorldMapManager)
     }
 
     private fun getStringByKey(d2oObject: Map<String, Any>, key: String): String {

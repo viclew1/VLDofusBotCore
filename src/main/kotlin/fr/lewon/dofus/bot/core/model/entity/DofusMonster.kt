@@ -7,6 +7,8 @@ data class DofusMonster(
     val id: Double,
     val name: String,
     val isMiniBoss: Boolean,
+    val isBoss: Boolean,
+    val isQuestMonster: Boolean,
     val spells: List<DofusSpell>,
     val baseStats: Map<DofusCharacteristic, Int>,
     val useSummonSlot: Boolean,

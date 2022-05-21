@@ -15,7 +15,7 @@ abstract class AbstractD2PUrlLoaderAdapter(protected val loaderHeader: Int) {
 
             header = stream.readByte().toInt()
             if (header != loaderHeader) {
-                error("Invalid D2P stream")
+                error("Invalid D2P stream, expected loaderHeader : $loaderHeader, actual : $header")
             }
         }
         stream.setPosition(0)

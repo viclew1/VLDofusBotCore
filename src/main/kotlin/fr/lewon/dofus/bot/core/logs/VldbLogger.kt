@@ -13,8 +13,12 @@ class VldbLogger(val logItemCapacity: Int = DEFAULT_LOG_ITEM_CAPACITY) {
     val listeners = ArrayList<VldbLoggerListener>()
 
     private fun onLogsChange() {
-        val logsCopy = logs.toList()
+        val logsCopy = getLogs()
         listeners.forEach { it.onLogsChange(logsCopy) }
+    }
+
+    fun getLogs(): List<LogItem> {
+        return logs.toList()
     }
 
     fun clearLogs() {

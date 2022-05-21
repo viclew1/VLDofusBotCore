@@ -2,6 +2,7 @@ package fr.lewon.dofus.bot.core
 
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
 import fr.lewon.dofus.bot.core.d2p.elem.D2PElementsAdapter
+import fr.lewon.dofus.bot.core.d2p.gfx.D2PGfxAdapter
 import fr.lewon.dofus.bot.core.d2p.maps.D2PMapsAdapter
 import fr.lewon.dofus.bot.core.i18n.I18NUtil
 import fr.lewon.dofus.bot.core.io.gamefiles.VldbFilesUtil
@@ -16,7 +17,7 @@ object VldbCoreInitializer {
 
     var DEBUG = false
 
-    fun initAll(mapsDecryptionKey: String, mapsDecryptionKeyCharset: String) {
+    fun initAll(mapsDecryptionKey: String = "", mapsDecryptionKeyCharset: String = "") {
         processInitialization({ I18NUtil.init() }, "Initializing I18N ... ")
         processInitialization({ initAllD2O() }, "Initializing D2O ... ")
         processInitialization({ initAllD2P(mapsDecryptionKey, mapsDecryptionKeyCharset) }, "Initializing D2P ... ")
@@ -35,14 +36,19 @@ object VldbCoreInitializer {
     }
 
     private fun initAllD2P(mapsDecryptionKey: String, mapsDecryptionKeyCharset: String) {
+        D2PMapsAdapter.DECRYPTION_KEY = mapsDecryptionKey
+        D2PMapsAdapter.DECRYPTION_KEY_CHARSET = mapsDecryptionKeyCharset
         val mapsPath = "${VldbFilesUtil.getDofusDirectory()}/content/maps"
         D2PElementsAdapter.initStream("$mapsPath/elements.ele")
         File(mapsPath).listFiles()
             ?.filter { it.absolutePath.endsWith(".d2p") }
             ?.forEach { D2PMapsAdapter.initStream(it.absolutePath) }
             ?: error("Maps directory not found : $mapsPath}")
-        D2PMapsAdapter.DECRYPTION_KEY = mapsDecryptionKey
-        D2PMapsAdapter.DECRYPTION_KEY_CHARSET = mapsDecryptionKeyCharset
+        val worldGfxPath = "${VldbFilesUtil.getDofusDirectory()}/content/gfx/world"
+        File(worldGfxPath).listFiles()
+            ?.filter { it.absolutePath.endsWith(".d2p") }
+            ?.forEach { D2PGfxAdapter.initStream(it.absolutePath) }
+            ?: error("World gfx directory not found : $worldGfxPath}")
     }
 
     private fun initVldbManagers() {

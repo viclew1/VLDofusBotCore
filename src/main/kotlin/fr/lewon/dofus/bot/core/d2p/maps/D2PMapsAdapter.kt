@@ -1,7 +1,6 @@
 package fr.lewon.dofus.bot.core.d2p.maps
 
-import fr.lewon.dofus.bot.core.d2p.AbstractD2PUrlLoaderAdapter
-import fr.lewon.dofus.bot.core.d2p.D2PIndex
+import fr.lewon.dofus.bot.core.d2p.AbstractLinkedD2PUrlLoaderAdapter
 import fr.lewon.dofus.bot.core.d2p.maps.cell.Cell
 import fr.lewon.dofus.bot.core.d2p.maps.cell.CellData
 import fr.lewon.dofus.bot.core.d2p.maps.cell.CompleteCellData
@@ -10,19 +9,20 @@ import fr.lewon.dofus.bot.core.d2p.maps.element.ElementType
 import fr.lewon.dofus.bot.core.d2p.maps.element.GraphicalElement
 import fr.lewon.dofus.bot.core.d2p.maps.element.SoundElement
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
-import java.io.File
 import java.nio.charset.Charset
 import kotlin.experimental.xor
 
-object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
+object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(77) {
 
     const val MAP_CELLS_COUNT = 560
 
-    private val indexes = HashMap<Double, D2PIndex>()
-    private val properties = HashMap<String, String>()
-
     lateinit var DECRYPTION_KEY: String
     lateinit var DECRYPTION_KEY_CHARSET: String
+
+    override fun getId(filePath: String): Double {
+        return Regex(".*?/([0-9]+)\\.dlm").find(filePath)?.destructured?.component1()?.toDouble()
+            ?: error("Invalid key")
+    }
 
     fun getCompleteCellDataByCellId(mapId: Double): HashMap<Int, CompleteCellData> {
         val index = indexes[mapId] ?: error("Missing map : $mapId")
@@ -30,59 +30,6 @@ object D2PMapsAdapter : AbstractD2PUrlLoaderAdapter(77) {
         fileStream.setPosition(index.offset)
         val data = fileStream.readNBytes(index.length)
         return deserialize(loadFromData(data))
-    }
-
-    override fun initStream(path: String) {
-        var filePath = path
-        var file: File? = File(filePath)
-        var stream: ByteArrayReader
-        while (file != null && file.exists()) {
-            stream = ByteArrayReader(file.readBytes())
-            val vMax = stream.readByte().toInt()
-            val vMin = stream.readByte().toInt()
-            if (vMax != 2 || vMin != 1) {
-                error("Invalid maps file : $path")
-            }
-            stream.setPosition(file.length().toInt() - 24)
-            val dataOffset = stream.readInt()
-            val dataCount = stream.readInt()
-            val indexOffset = stream.readInt()
-            val indexCount = stream.readInt()
-            val propertiesOffset = stream.readInt()
-            val propertiesCount = stream.readInt()
-            stream.setPosition(propertiesOffset)
-            file = null
-            for (i in 0 until propertiesCount) {
-                val propertyName = stream.readUTF()
-                val propertyValue = stream.readUTF()
-                properties[propertyName] = propertyValue
-                if (propertyName == "link") {
-                    val idx = filePath.lastIndexOf("/")
-                    filePath = if (idx != -1) {
-                        filePath.substring(0, idx) + "/" + propertyValue
-                    } else {
-                        propertyValue
-                    }
-                    file = File(filePath)
-                }
-            }
-            stream.setPosition(indexOffset)
-            for (i in 0 until indexCount) {
-                filePath = stream.readUTF()
-                val fileOffset = stream.readInt()
-                val fileLength = stream.readInt()
-                indexes[getMapId(filePath)] = D2PIndex(fileOffset + dataOffset, fileLength, stream)
-            }
-        }
-    }
-
-    private fun getMapId(filePath: String): Double {
-        return Regex(".*?/([0-9]+)\\.dlm")
-            .find(filePath)
-            ?.destructured
-            ?.component1()
-            ?.toDouble()
-            ?: error("Invalid key")
     }
 
     private fun deserialize(bar: ByteArrayReader): HashMap<Int, CompleteCellData> {
