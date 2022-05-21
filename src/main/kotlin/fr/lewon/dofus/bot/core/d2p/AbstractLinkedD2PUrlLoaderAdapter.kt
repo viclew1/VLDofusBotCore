@@ -47,7 +47,7 @@ abstract class AbstractLinkedD2PUrlLoaderAdapter(loaderHeader: Int) : AbstractD2
                 filePath = stream.readUTF()
                 val fileOffset = stream.readInt()
                 val fileLength = stream.readInt()
-                indexes[getId(filePath)] = D2PIndex(fileOffset + dataOffset, fileLength, stream)
+                indexes[getId(filePath)] = D2PIndex(fileOffset + dataOffset, fileLength, path)
             }
         }
     }

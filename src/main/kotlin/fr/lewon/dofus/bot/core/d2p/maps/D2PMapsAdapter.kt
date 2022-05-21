@@ -9,6 +9,7 @@ import fr.lewon.dofus.bot.core.d2p.maps.element.ElementType
 import fr.lewon.dofus.bot.core.d2p.maps.element.GraphicalElement
 import fr.lewon.dofus.bot.core.d2p.maps.element.SoundElement
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
+import java.io.File
 import java.nio.charset.Charset
 import kotlin.experimental.xor
 
@@ -26,7 +27,7 @@ object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(77) {
 
     fun getCompleteCellDataByCellId(mapId: Double): HashMap<Int, CompleteCellData> {
         val index = indexes[mapId] ?: error("Missing map : $mapId")
-        val fileStream = index.stream
+        val fileStream = ByteArrayReader(File(index.filePath).readBytes())
         fileStream.setPosition(index.offset)
         val data = fileStream.readNBytes(index.length)
         return deserialize(loadFromData(data))
