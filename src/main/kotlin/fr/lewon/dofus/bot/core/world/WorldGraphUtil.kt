@@ -15,6 +15,7 @@ object WorldGraphUtil {
     private val transitionsByInteractiveId = HashMap<Double, ArrayList<Transition>>()
     private var vertexUid = 0.0
     private val invalidTransitionIds = ArrayList<Double>()
+    private val invalidMapIds = ArrayList<Double>()
 
     fun init(stream: ByteArrayReader) {
         val edgeCount = stream.readInt()
@@ -91,7 +92,7 @@ object WorldGraphUtil {
                     return node.getTransitions()
                 }
                 val outgoingEdges = outgoingEdges[node.vertex.uid]
-                    ?.filter { !explored.contains(it.to) }
+                    ?.filter { !invalidMapIds.contains(it.to.mapId) && !explored.contains(it.to) }
                     ?.flatMap { buildNodes(node, it, characterInfo) }
                     ?.onEach { explored.add(it.vertex) }
                     ?: emptyList()
@@ -115,7 +116,8 @@ object WorldGraphUtil {
             return false
         }
         if (transition.type == TransitionType.INTERACTIVE) {
-            val transitionsForInteractiveCount = transitionsByInteractiveId[transition.id]?.size ?: 0
+            val transitionsForInteractiveCount = transitionsByInteractiveId[transition.id]
+                ?.map { it.transitionMapId }?.distinct()?.size ?: 0
             if (transitionsForInteractiveCount != 1) {
                 return false
             }
@@ -153,6 +155,10 @@ object WorldGraphUtil {
 
     fun addInvalidTransitionId(id: Double) {
         invalidTransitionIds.add(id)
+    }
+
+    fun addInvalidMapId(id: Double) {
+        invalidMapIds.add(id)
     }
 
 }

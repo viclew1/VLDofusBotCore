@@ -5,7 +5,7 @@ data class Transition(
     val direction: Int,
     val type: TransitionType,
     val skillId: Int,
-    val criterion: String,
+    var criterion: String,
     val transitionMapId: Double,
     val cellId: Int,
     val id: Double
