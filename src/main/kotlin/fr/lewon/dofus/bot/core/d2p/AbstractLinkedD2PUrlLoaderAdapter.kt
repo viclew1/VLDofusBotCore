@@ -3,7 +3,10 @@ package fr.lewon.dofus.bot.core.d2p
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import java.io.File
 
-abstract class AbstractLinkedD2PUrlLoaderAdapter(loaderHeader: Int) : AbstractD2PUrlLoaderAdapter(loaderHeader) {
+abstract class AbstractLinkedD2PUrlLoaderAdapter(
+    private val cacheStreams: Boolean,
+    loaderHeader: Int
+) : AbstractD2PUrlLoaderAdapter(loaderHeader) {
 
     protected val indexes = HashMap<Double, D2PIndex>()
     protected val properties = HashMap<String, String>()
@@ -47,10 +50,23 @@ abstract class AbstractLinkedD2PUrlLoaderAdapter(loaderHeader: Int) : AbstractD2
                 filePath = stream.readUTF()
                 val fileOffset = stream.readInt()
                 val fileLength = stream.readInt()
-                indexes[getId(filePath)] = D2PIndex(fileOffset + dataOffset, fileLength, path)
+                val id = getId(filePath)
+                val index = if (cacheStreams) {
+                    D2PIndex(fileOffset + dataOffset, fileLength, path, stream)
+                } else {
+                    D2PIndex(fileOffset + dataOffset, fileLength, path)
+                }
+                indexes[id] = index
             }
         }
     }
+
+    protected fun loadStream(id: Double): ByteArray {
+        val index = indexes[id] ?: error("No index for id : $id")
+        return doLoadStream(index)
+    }
+
+    protected abstract fun doLoadStream(index: D2PIndex): ByteArray
 
     protected abstract fun getId(filePath: String): Double
 

@@ -10,9 +10,10 @@ object D2PElementsAdapter : AbstractD2PUrlLoaderAdapter(69) {
 
     private var fileVersion = -1
     private val elementsIndexById = HashMap<Int, ElementIndex>()
+    private val elementById = HashMap<Int, GraphicalElementData>()
 
     fun getElement(elementId: Int): GraphicalElementData {
-        return readElement(elementId)
+        return elementById[elementId] ?: readElement(elementId)
     }
 
     override fun initStream(path: String) {
@@ -60,6 +61,7 @@ object D2PElementsAdapter : AbstractD2PUrlLoaderAdapter(69) {
         stream.setPosition(elementIndex.index)
         return GraphicalElementFactory.getGraphicalElementData(elementId, stream.readUnsignedByte())
             .also { it.deserialize(stream, fileVersion) }
+            .also { elementById[elementId] = it }
     }
 
     private class ElementIndex(val fileName: String, val index: Int)

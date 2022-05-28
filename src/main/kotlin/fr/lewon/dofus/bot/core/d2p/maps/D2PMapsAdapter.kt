@@ -1,6 +1,7 @@
 package fr.lewon.dofus.bot.core.d2p.maps
 
 import fr.lewon.dofus.bot.core.d2p.AbstractLinkedD2PUrlLoaderAdapter
+import fr.lewon.dofus.bot.core.d2p.D2PIndex
 import fr.lewon.dofus.bot.core.d2p.maps.cell.Cell
 import fr.lewon.dofus.bot.core.d2p.maps.cell.CellData
 import fr.lewon.dofus.bot.core.d2p.maps.cell.CompleteCellData
@@ -9,11 +10,10 @@ import fr.lewon.dofus.bot.core.d2p.maps.element.ElementType
 import fr.lewon.dofus.bot.core.d2p.maps.element.GraphicalElement
 import fr.lewon.dofus.bot.core.d2p.maps.element.SoundElement
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
-import java.io.File
 import java.nio.charset.Charset
 import kotlin.experimental.xor
 
-object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(77) {
+object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(true, 77) {
 
     const val MAP_CELLS_COUNT = 560
 
@@ -26,11 +26,13 @@ object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(77) {
     }
 
     fun getCompleteCellDataByCellId(mapId: Double): HashMap<Int, CompleteCellData> {
-        val index = indexes[mapId] ?: error("Missing map : $mapId")
-        val fileStream = ByteArrayReader(File(index.filePath).readBytes())
+        return deserialize(loadFromData(loadStream(mapId)))
+    }
+
+    override fun doLoadStream(index: D2PIndex): ByteArray {
+        val fileStream = index.stream ?: error("Stream should be cached")
         fileStream.setPosition(index.offset)
-        val data = fileStream.readNBytes(index.length)
-        return deserialize(loadFromData(data))
+        return fileStream.readNBytes(index.length)
     }
 
     private fun deserialize(bar: ByteArrayReader): HashMap<Int, CompleteCellData> {

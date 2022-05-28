@@ -70,8 +70,8 @@ data class Container(
         }
         val size = computeSizeUsingChildren()
             ?: computeIconSize()
-        width = width ?: size?.x ?: 5f
-        height = height ?: size?.y ?: 5f
+        width = width ?: size.x
+        height = height ?: size.y
         return UIPoint(width, height)
     }
 
@@ -194,7 +194,6 @@ data class Container(
         val childSize = child.fixedSize
             ?: child.computeSizeUsingChildren()
             ?: child.computeIconSize()
-            ?: UIPoint(5f, 5f)
         val marginLeft = child.anchors.firstOrNull { AnchorPoint.valueOf(it.relativePoint).widthRatio == 0f }?.let {
             val anchorPoint = AnchorPoint.valueOf(it.point)
             val margin = parseDimension(it.relDimension, it.absDimension).x.absoluteValue
@@ -222,8 +221,9 @@ data class Container(
         return UIPoint(childSize.x + marginLeft + marginRight, childSize.y + marginBottom + marginTop)
     }
 
-    private fun computeIconSize(): UIPoint? {
+    private fun computeIconSize(): UIPoint {
         return UIIconManager.getIconSize(this)
+            ?: UIPoint(24f, 24f)
     }
 
     private fun getNonNullPositionsByAnchorPoint(): Map<AnchorPoint, UIPoint> {
