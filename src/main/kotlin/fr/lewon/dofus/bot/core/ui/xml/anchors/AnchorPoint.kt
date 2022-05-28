@@ -1,4 +1,4 @@
-package fr.lewon.dofus.bot.core.ui.xml.modele.ui
+package fr.lewon.dofus.bot.core.ui.xml.anchors
 
 enum class AnchorPoint(
     val widthRatio: Float,

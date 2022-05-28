@@ -1,6 +1,3 @@
 package fr.lewon.dofus.bot.core.ui
 
-data class UIRectangle(
-    var topLeft: UIPoint,
-    var bottomRight: UIPoint,
-)
+data class UIRectangle(var position: UIPoint, var size: UIPoint)

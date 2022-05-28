@@ -7,8 +7,8 @@ import fr.lewon.dofus.bot.core.d2p.maps.D2PMapsAdapter
 import fr.lewon.dofus.bot.core.i18n.I18NUtil
 import fr.lewon.dofus.bot.core.io.gamefiles.VldbFilesUtil
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
+import fr.lewon.dofus.bot.core.ui.managers.UIIconManager
 import fr.lewon.dofus.bot.core.ui.managers.XmlUiUtil
-import fr.lewon.dofus.bot.core.ui.xml.modele.ui.UiModule
 import fr.lewon.dofus.bot.core.world.WorldGraphUtil
 import org.reflections.Reflections
 import java.io.File
@@ -23,7 +23,7 @@ object VldbCoreInitializer {
         processInitialization({ initAllD2P(mapsDecryptionKey, mapsDecryptionKeyCharset) }, "Initializing D2P ... ")
         processInitialization({ initVldbManagers() }, "Initializing VLDB managers ... \n")
         processInitialization({ initWorldGraph() }, "Initializing world graph ... ")
-        processInitialization({ initUIGroups() }, "Initializing UI Groups ... ")
+        processInitialization({ initUiIcons() }, "Initializing UI Icons ... ")
         processInitialization({ initUIXml() }, "Initializing UI XML ... ")
     }
 
@@ -84,26 +84,31 @@ object VldbCoreInitializer {
         WorldGraphUtil.init(ByteArrayReader(worldGraphFile.readBytes()))
     }
 
-    private fun initUIGroups() {
-        val xmlUiPath = "${VldbFilesUtil.getDofusDirectory()}/ui"
-        val subDirs = File(xmlUiPath).listFiles() ?: error("XML directory not found : $xmlUiPath}")
-        for (subDir in subDirs) {
-            val d2uiFile = subDir.listFiles()?.firstOrNull { it.absolutePath.endsWith(".d2ui") }
-                ?: continue
-            UiModule.init(ByteArrayReader(d2uiFile.readBytes()))
-        }
+    private fun initUiIcons() {
+        val themeDir = File("${VldbFilesUtil.getDofusDirectory()}/content/themes/darkStone")
+        initUiIcons(themeDir)
+        themeDir.listFiles()?.filter { it.absolutePath.endsWith(".json") }
+            ?.forEach { UIIconManager.initThemeData(it) }
+            ?: error("Theme data files not found : ${themeDir.absolutePath}")
+    }
+
+    private fun initUiIcons(dir: File) {
+        val iconFiles = dir.listFiles()?.filter { it.absolutePath.endsWith(".png") }
+            ?: error("Icon files not found : ${dir.absolutePath}")
+        iconFiles.forEach { UIIconManager.initIcon(it) }
+        dir.listFiles()?.filter { it.isDirectory }?.forEach { initUiIcons(it) }
     }
 
     private fun initUIXml() {
-        val xmlUiPath = "${VldbFilesUtil.getDofusDirectory()}/ui"
-        val subDirs = File(xmlUiPath).listFiles() ?: error("XML directory not found : $xmlUiPath}")
-        for (subDir in subDirs) {
-            val uiDir = subDir.listFiles()?.firstOrNull { it.isDirectory && it.name.equals("ui") }
-                ?: continue
-            val xmlFiles = uiDir.listFiles()?.filter { it.absolutePath.endsWith(".xml") }
-                ?: error("XML files not found : ${uiDir.absolutePath}")
-            xmlFiles.forEach { XmlUiUtil.init(it) }
-        }
+        initUIXml(File("${VldbFilesUtil.getDofusDirectory()}/ui"))
+        XmlUiUtil.initAllContainers()
+    }
+
+    private fun initUIXml(dir: File) {
+        val xmlFiles = dir.listFiles()?.filter { it.absolutePath.endsWith(".xml") }
+            ?: error("XML files not found : ${dir.absolutePath}")
+        xmlFiles.forEach { XmlUiUtil.init(it) }
+        dir.listFiles()?.filter { it.isDirectory }?.forEach { initUIXml(it) }
     }
 
     private fun processInitialization(initialization: () -> Unit, startMessage: String) {

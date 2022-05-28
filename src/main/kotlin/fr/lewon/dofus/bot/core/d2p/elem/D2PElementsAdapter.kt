@@ -1,28 +1,22 @@
 package fr.lewon.dofus.bot.core.d2p.elem
 
-import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import fr.lewon.dofus.bot.core.d2p.AbstractD2PUrlLoaderAdapter
 import fr.lewon.dofus.bot.core.d2p.elem.graphical.GraphicalElementData
 import fr.lewon.dofus.bot.core.d2p.elem.graphical.GraphicalElementFactory
+import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import java.io.File
 
 object D2PElementsAdapter : AbstractD2PUrlLoaderAdapter(69) {
 
-    private lateinit var stream: ByteArrayReader
     private var fileVersion = -1
-    private val elementsMap = HashMap<Int, GraphicalElementData>()
-    private val elementsIndex = HashMap<Int, Int>()
+    private val elementsIndexById = HashMap<Int, ElementIndex>()
 
     fun getElement(elementId: Int): GraphicalElementData {
-        return elementsMap[elementId] ?: readElement(elementId)
+        return readElement(elementId)
     }
 
     override fun initStream(path: String) {
-        val file = File(path)
-        if (!file.exists()) {
-            error("Elements file not found : $path")
-        }
-        stream = loadFromData(file.readBytes())
+        val stream = getFileStream(path)
         val header = stream.readByte().toInt()
         if (header != loaderHeader) {
             error("Unknown file format for elements : $header")
@@ -35,9 +29,9 @@ object D2PElementsAdapter : AbstractD2PUrlLoaderAdapter(69) {
                 skypLen = stream.readUnsignedShort()
             }
             val elementId = stream.readInt()
-            elementsIndex[elementId] = stream.getPosition()
+            elementsIndexById[elementId] = ElementIndex(path, stream.getPosition())
             if (fileVersion <= 8) {
-                elementsMap[elementId] = readElement(elementId)
+                readElement(elementId)
             } else {
                 stream.skip(skypLen - 4)
             }
@@ -52,11 +46,22 @@ object D2PElementsAdapter : AbstractD2PUrlLoaderAdapter(69) {
         }
     }
 
-    private fun readElement(edId: Int): GraphicalElementData {
-        val index = elementsIndex[edId] ?: error("Element not found : $edId")
-        stream.setPosition(index)
-        return GraphicalElementFactory.getGraphicalElementData(edId, stream.readUnsignedByte())
+    private fun getFileStream(path: String): ByteArrayReader {
+        val file = File(path)
+        if (!file.exists()) {
+            error("Elements file not found : $path")
+        }
+        return loadFromData(file.readBytes())
+    }
+
+    private fun readElement(elementId: Int): GraphicalElementData {
+        val elementIndex = elementsIndexById[elementId] ?: error("Element not found : $elementId")
+        val stream = getFileStream(elementIndex.fileName)
+        stream.setPosition(elementIndex.index)
+        return GraphicalElementFactory.getGraphicalElementData(elementId, stream.readUnsignedByte())
             .also { it.deserialize(stream, fileVersion) }
     }
+
+    private class ElementIndex(val fileName: String, val index: Int)
 
 }
