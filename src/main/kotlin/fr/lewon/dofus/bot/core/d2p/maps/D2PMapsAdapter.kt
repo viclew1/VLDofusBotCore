@@ -2,13 +2,11 @@ package fr.lewon.dofus.bot.core.d2p.maps
 
 import fr.lewon.dofus.bot.core.d2p.AbstractLinkedD2PUrlLoaderAdapter
 import fr.lewon.dofus.bot.core.d2p.D2PIndex
-import fr.lewon.dofus.bot.core.d2p.maps.cell.Cell
 import fr.lewon.dofus.bot.core.d2p.maps.cell.CellData
 import fr.lewon.dofus.bot.core.d2p.maps.cell.CompleteCellData
-import fr.lewon.dofus.bot.core.d2p.maps.element.BasicElement
-import fr.lewon.dofus.bot.core.d2p.maps.element.ElementType
+import fr.lewon.dofus.bot.core.d2p.maps.cell.Fixture
+import fr.lewon.dofus.bot.core.d2p.maps.cell.Layer
 import fr.lewon.dofus.bot.core.d2p.maps.element.GraphicalElement
-import fr.lewon.dofus.bot.core.d2p.maps.element.SoundElement
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import java.nio.charset.Charset
 import kotlin.experimental.xor
@@ -16,6 +14,10 @@ import kotlin.experimental.xor
 object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(true, 77) {
 
     const val MAP_CELLS_COUNT = 560
+    const val CELL_WIDTH = 86.0f
+    const val CELL_HEIGHT = 43.0f
+    const val CELL_HALF_WIDTH = CELL_WIDTH / 2f
+    const val CELL_HALF_HEIGHT = CELL_HEIGHT / 2f
 
     lateinit var DECRYPTION_KEY: String
     lateinit var DECRYPTION_KEY_CHARSET: String
@@ -85,135 +87,38 @@ object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(true, 77) {
         if (mapVersion > 10) {
             val tacticalModeTemplateId = stream.readInt()
         }
-        val backgroundsCount = stream.readByte()
+        val backgroundsCount = stream.readUnsignedByte()
         for (i in 0 until backgroundsCount) {
-            readFixture(stream)
+            val fixture = Fixture()
+            fixture.deserialize(stream)
         }
-        val foregroundsCount = stream.readByte()
+        val foregroundsCount = stream.readUnsignedByte()
         for (i in 0 until foregroundsCount) {
-            readFixture(stream)
+            val fixture = Fixture()
+            fixture.deserialize(stream)
         }
-        val cellsCount = MAP_CELLS_COUNT
         stream.readInt()
         val groundCRC = stream.readInt()
-        val layersCount = stream.readByte()
+        val layersCount = stream.readUnsignedByte()
         val completeCellDataById = HashMap<Int, CompleteCellData>()
         val graphicalElementsByCellId = HashMap<Int, ArrayList<GraphicalElement>>()
         for (i in 0 until layersCount) {
-            readLayer(mapVersion, stream).forEach {
-                val graphicalElements = graphicalElementsByCellId.computeIfAbsent(it.cellId) { ArrayList() }
-                graphicalElements.addAll(it.graphicalElements)
+            val layer = Layer()
+            layer.deserialize(stream, mapVersion)
+            if (layer.layerType == Layer.LayerType.LAYER_DECOR) {
+                layer.cells.forEach {
+                    val graphicalElements = graphicalElementsByCellId.computeIfAbsent(it.cellId) { ArrayList() }
+                    graphicalElements.addAll(it.graphicalElements)
+                }
             }
         }
-        for (i in 0 until cellsCount) {
-            val cd = readCellData(mapVersion, i, stream)
-            val graphicalElements = graphicalElementsByCellId[cd.cellId] ?: emptyList()
-            completeCellDataById[cd.cellId] = CompleteCellData(cd.cellId, cd, graphicalElements)
+        for (cellId in 0 until MAP_CELLS_COUNT) {
+            val cellData = CellData(cellId)
+            cellData.deserialize(stream, mapVersion)
+            val graphicalElements = graphicalElementsByCellId[cellId] ?: emptyList()
+            completeCellDataById[cellId] = CompleteCellData(cellId, cellData, graphicalElements)
         }
         return completeCellDataById
-    }
-
-    private fun readFixture(stream: ByteArrayReader) {
-        val fixtureId = stream.readInt()
-        stream.readUnsignedShort()
-        stream.readUnsignedShort()
-        val rotation = stream.readUnsignedShort()
-        val xScale = stream.readUnsignedShort()
-        val yScale = stream.readUnsignedShort()
-        val redMultiplier = stream.readByte()
-        val greenMultiplier = stream.readByte()
-        val blueMultiplier = stream.readByte()
-        val alpha = stream.readByte()
-    }
-
-    private fun readLayer(mapVersion: Int, stream: ByteArrayReader): List<Cell> {
-        val layerId = if (mapVersion >= 9) {
-            stream.readByte()
-        } else {
-            stream.readInt()
-        }
-        val cellsCount = stream.readUnsignedShort()
-        val cells = ArrayList<Cell>()
-        if (cellsCount > 0) {
-            var cell: Cell? = null
-            for (i in 0 until cellsCount) {
-                cell = readCell(mapVersion, stream)
-                cells.add(cell)
-            }
-            val maxMapCellId = MAP_CELLS_COUNT - 1
-            if (cell != null && cell.cellId < maxMapCellId) {
-                val endCell = Cell(maxMapCellId)
-                cells.add(endCell)
-            }
-        }
-        return cells
-    }
-
-    private fun readCell(mapVersion: Int, stream: ByteArrayReader): Cell {
-        val cellId = stream.readUnsignedShort()
-        val elementsCount = stream.readUnsignedShort()
-        val cell = Cell(cellId)
-        for (i in 0 until elementsCount) {
-            val be = getBasicElement(stream.readByte().toInt(), cell)
-            be.read(mapVersion, stream)
-            if (be is GraphicalElement) {
-                cell.graphicalElements.add(be)
-            }
-        }
-        return cell
-    }
-
-    private fun getBasicElement(typeValue: Int, cell: Cell): BasicElement {
-        return when (typeValue) {
-            ElementType.GRAPHICAL.typeValue -> GraphicalElement(cell)
-            ElementType.SOUND.typeValue -> SoundElement(cell)
-            else -> error("Invalid element type : $typeValue")
-        }
-    }
-
-    private fun readCellData(mapVersion: Int, cellId: Int, stream: ByteArrayReader): CellData {
-        val cd = CellData(cellId)
-        cd.floor = stream.readByte().toInt() * 10
-        if (cd.floor == -1280) {
-            return cd
-        }
-        if (mapVersion >= 9) {
-            val tmpbytesv9 = stream.readUnsignedShort()
-            cd.mov = tmpbytesv9 and 1 == 0
-            cd.nonWalkableDuringFight = tmpbytesv9 and 2 != 0
-            cd.nonWalkableDuringRP = tmpbytesv9 and 4 != 0
-            cd.los = tmpbytesv9 and 8 == 0
-            cd.blue = tmpbytesv9 and 16 != 0
-            cd.red = tmpbytesv9 and 32 != 0
-            cd.visible = tmpbytesv9 and 64 != 0
-            cd.farmCell = tmpbytesv9 and 128 != 0
-            if (mapVersion >= 10) {
-                cd.havenbagCell = tmpbytesv9 and 256 != 0
-            }
-        } else {
-            cd.losmov = stream.readByte().toInt()
-            cd.los = cd.losmov and 2 shr 1 == 1
-            cd.mov = cd.losmov and 1 == 1
-            cd.visible = cd.losmov and 64 shr 6 == 1
-            cd.farmCell = cd.losmov and 32 shr 5 == 1
-            cd.blue = cd.losmov and 16 shr 4 == 1
-            cd.red = cd.losmov and 8 shr 3 == 1
-            cd.nonWalkableDuringRP = cd.losmov and 128 shr 7 == 1
-            cd.nonWalkableDuringFight = cd.losmov and 4 shr 2 == 1
-        }
-        cd.speed = stream.readByte().toInt()
-        cd.mapChangeData = stream.readByte().toInt()
-        if (mapVersion > 5) {
-            cd.moveZone = stream.readByte().toInt()
-        }
-        if (mapVersion > 10 && (cd.hasLinkedZoneRP() || cd.hasLinkedZoneFight())) {
-            cd.linkedZone = stream.readByte().toInt()
-        }
-        if (mapVersion == 8) {
-            val tmpBits = stream.readByte().toInt()
-            cd.arrow = 15 and tmpBits
-        }
-        return cd
     }
 
 }
