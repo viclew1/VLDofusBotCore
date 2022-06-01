@@ -15,8 +15,9 @@ enum class DofusUIElement(
     ZAAP_SELECTION("zaapiSelection.xml", OverrideType.ADD_OVERRIDE, "zaapSelection", "window316"),
     BANNER("banner.xml", OverrideType.REPLACE, "banner", "mainCtr"),
     TREASURE_HUNT("treasureHunt.xml", OverrideType.REPLACE, "treasureHunt", "ctr_hunt"),
+    ARENA("pvpArena.xml", OverrideType.REPLACE, "pvpArena", "window830"),
     MOUNT_PADDOCK("mountPaddock.xml"),
-    ARENA("pvpArena.xml", OverrideType.REPLACE, "pvpArena", "window830");
+    STORAGE("storage.xml");
 
     companion object {
         private const val CONTEXT_DEFAULT = "default"
