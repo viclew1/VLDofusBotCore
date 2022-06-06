@@ -12,6 +12,7 @@ object D2PElementsAdapter : AbstractD2PUrlLoaderAdapter(69) {
     private val elementsIndexById = HashMap<Int, ElementIndex>()
     private val elementById = HashMap<Int, GraphicalElementData>()
 
+    @Synchronized
     fun getElement(elementId: Int): GraphicalElementData {
         return elementById[elementId] ?: readElement(elementId)
     }

@@ -12,6 +12,7 @@ object D2PGfxAdapter : AbstractLinkedD2PUrlLoaderAdapter(false, -1) {
             ?: error("Invalid key")
     }
 
+    @Synchronized
     fun getGfxImageDataById(gfxId: Double): ByteArray {
         return loadStream(gfxId)
     }

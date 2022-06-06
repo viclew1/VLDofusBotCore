@@ -27,6 +27,7 @@ object D2PMapsAdapter : AbstractLinkedD2PUrlLoaderAdapter(true, 77) {
             ?: error("Invalid key")
     }
 
+    @Synchronized
     fun getCompleteCellDataByCellId(mapId: Double): HashMap<Int, CompleteCellData> {
         return deserialize(loadFromData(loadStream(mapId)))
     }
