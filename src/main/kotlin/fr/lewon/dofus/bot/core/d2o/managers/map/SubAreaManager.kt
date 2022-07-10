@@ -4,6 +4,7 @@ import fr.lewon.dofus.bot.core.VldbManager
 import fr.lewon.dofus.bot.core.d2o.D2OUtil
 import fr.lewon.dofus.bot.core.d2o.managers.entity.MonsterManager
 import fr.lewon.dofus.bot.core.i18n.I18NUtil
+import fr.lewon.dofus.bot.core.model.maps.DofusMap
 import fr.lewon.dofus.bot.core.model.maps.DofusSubArea
 
 object SubAreaManager : VldbManager {
@@ -40,6 +41,11 @@ object SubAreaManager : VldbManager {
 
     fun getAllSubAreas(): List<DofusSubArea> {
         return ArrayList(subAreaById.values)
+    }
+
+    fun getAllZaapMaps(): List<DofusMap> {
+        return subAreaById.values.filter { it.associatedZaapMapId > 0 }
+            .map { MapManager.getDofusMap(it.associatedZaapMapId) }
     }
 
     fun getSubArea(subAreaId: Double): DofusSubArea {

@@ -51,8 +51,7 @@ object D2OUtil {
     fun init(filePath: String) {
         val file = File(filePath)
         val moduleName = file.name.substring(0, file.name.indexOf(".d2o"))
-        val stream =
-            streamsByModuleName.computeIfAbsent(moduleName) { ByteArrayReader(file.readBytes()) }
+        val stream = streamsByModuleName.computeIfAbsent(moduleName) { ByteArrayReader(file.readBytes()) }
         initFromStream(stream, moduleName)
     }
 

@@ -12,10 +12,10 @@ enum class DofusUIElement(
 ) {
 
     INVENTORY("equipmentUi.xml", OverrideType.REPLACE, "storage", "equipmentUi"),
-    ZAAP_SELECTION("zaapiSelection.xml", OverrideType.ADD_OVERRIDE, "zaapSelection", "window316"),
+    ZAAP_SELECTION("zaapiSelection.xml", OverrideType.ADD_OVERRIDE, "zaapSelection", "window\\d"),
     BANNER("banner.xml", OverrideType.REPLACE, "banner", "mainCtr"),
     TREASURE_HUNT("treasureHunt.xml", OverrideType.REPLACE, "treasureHunt", "ctr_hunt"),
-    ARENA("pvpArena.xml", OverrideType.REPLACE, "pvpArena", "window830"),
+    ARENA("pvpArena.xml", OverrideType.REPLACE, "pvpArena", "window\\d"),
     MOUNT_PADDOCK("mountPaddock.xml"),
     STORAGE("storage.xml");
 
@@ -23,9 +23,10 @@ enum class DofusUIElement(
         private const val CONTEXT_DEFAULT = "default"
         private const val CONTEXT_FIGHT = "fight"
 
-        private fun getUIPoints(): DofusUIPointByKey {
-            return DatUtil.getDatFileContent("Berilia_ui_positions", DofusUIPointByKey::class.java)
-                ?: error("Couldn't get UI positions")
+        private fun getUIPoint(keyRegex: String): UIPoint? {
+            val uiPointByKey = DatUtil.getDatFileContent("Berilia_ui_positions", DofusUIPointByKey::class.java)
+                ?: error("Couldn't get UI position : $keyRegex")
+            return uiPointByKey[keyRegex]
         }
 
         fun shouldInitializeXml(xmlFileName: String): Boolean {
@@ -45,11 +46,11 @@ enum class DofusUIElement(
 
     fun getContainer(fightContext: Boolean = false): Container {
         val uiDefinition = XmlUiUtil.getUIDefinition(xmlFileName)
-        val container = uiDefinition.children.firstOrNull { it.name == ctr }
+        val container = uiDefinition.children.firstOrNull { it.name.matches(Regex(ctr)) }
             ?: uiDefinition.children[0]
-        container.defaultSize = getUIPoints()[buildSizeKey(fightContext)]
+        container.defaultSize = getUIPoint(buildSizeKey(fightContext))
         XmlContainerInitializer.initAll(container)
-        val overriddenPosition = getUIPoints()[buildPosKey(fightContext)]
+        val overriddenPosition = getUIPoint(buildPosKey(fightContext))
             ?: return container
         val positionDelta = overrideType.getResultPosition(container.bounds.position, overriddenPosition)
             .transpose(container.bounds.position.invert())
