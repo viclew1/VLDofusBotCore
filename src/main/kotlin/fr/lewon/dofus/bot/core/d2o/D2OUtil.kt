@@ -1,6 +1,8 @@
 package fr.lewon.dofus.bot.core.d2o
 
+import fr.lewon.dofus.bot.core.VldbCoreInitializer
 import fr.lewon.dofus.bot.core.d2o.gamedata.GameDataClassDefinition
+import fr.lewon.dofus.bot.core.i18n.I18NUtil
 import fr.lewon.dofus.bot.core.io.stream.ByteArrayReader
 import java.io.File
 import java.util.concurrent.locks.ReentrantLock
@@ -98,4 +100,13 @@ object D2OUtil {
         classes[classId] = classDef
     }
 
+}
+
+fun main() {
+    VldbCoreInitializer.initAll()
+    D2OUtil.getObjects("SubAreas").forEach {
+        val nameId = it["nameId"].toString().toInt()
+        val name = I18NUtil.getLabel(nameId)
+        println("$name - $it")
+    }
 }
